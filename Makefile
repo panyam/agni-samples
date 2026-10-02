@@ -12,6 +12,23 @@
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 DIST    := dist
 
+# macOS tar writes a "._name" AppleDouble shadow beside every file it packs unless this is set, and
+# a Finder copy can leave the same shadows on disk, where the find below would match them by
+# extension. Both are excluded, because a consumer globbing *.kicad_sch reads a shadow as a
+# schematic and fails to parse it (agni issue 812).
+export COPYFILE_DISABLE := 1
+
+# A failing tar in the middle of a pipe still lets gzip write a valid empty archive, so without
+# pipefail a tar that rejects a flag produces a tarball that verifies and holds nothing.
+SHELL       := bash
+.SHELLFLAGS := -o pipefail -ec
+
+# Zeroed ownership, spelled for whichever tar is installed: bsdtar (macOS) and GNU tar (Linux) name
+# the same flags differently.
+TAR_IDS := $(shell tar --version 2>/dev/null | grep -q 'GNU tar' \
+             && echo "--owner=0 --group=0 --numeric-owner" \
+             || echo "--uid 0 --gid 0 --uname '' --gname ''")
+
 .PHONY: all dist clean list verify
 
 all: dist
@@ -20,19 +37,19 @@ all: dist
 # Jetson board file is 81MB, so shipping it here would multiply every tutorial CI run by twenty.
 $(DIST)/tutorial-board-$(VERSION).tar.gz:
 	@mkdir -p $(DIST)
-	find boards/jetson-agx-thor-baseboard -type f \
+	find boards/jetson-agx-thor-baseboard -type f ! -name '._*' \
 	  \( -name '*.kicad_sch' -o -name '*.kicad_pro' -o -name 'LICENSE' -o -name 'README.md' \) \
-	  | sort | tar -cf - -T - --uid 0 --gid 0 --uname '' --gname '' | gzip -n -9 > $@
+	  | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
 
 # oracle-corpus: every board, both views. The KiCad reader cross-check reads a schematic and its
 # board file and compares the two net sets, so it needs the copper half that the tutorial does not.
 $(DIST)/oracle-corpus-$(VERSION).tar.gz:
 	@mkdir -p $(DIST)
-	find boards -type f \
+	find boards -type f ! -name '._*' \
 	  \( -name '*.kicad_sch' -o -name '*.kicad_pcb' -o -name '*.kicad_pro' -o -name '*.kicad_dru' \
 	     -o -name '*.kicad_sym' -o -name '*.kicad_mod' -o -name '*-lib-table' \
 	     -o -name 'LICENSE' -o -name 'README.md' \) \
-	  | sort | tar -cf - -T - --uid 0 --gid 0 --uname '' --gname '' | gzip -n -9 > $@
+	  | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
 
 dist: $(DIST)/tutorial-board-$(VERSION).tar.gz $(DIST)/oracle-corpus-$(VERSION).tar.gz
 	@cd $(DIST) && shasum -a 256 *-$(VERSION).tar.gz > SHA256SUMS
@@ -50,6 +67,9 @@ list: dist
 
 verify:
 	@cd $(DIST) && shasum -a 256 -c SHA256SUMS
+	@for f in $(DIST)/*-$(VERSION).tar.gz; do \
+	  if tar -tzf $$f | grep -q '\(^\|/\)\._'; then echo "$$f carries AppleDouble files"; exit 1; fi; \
+	done
 
 clean:
 	rm -rf $(DIST)
