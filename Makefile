@@ -43,12 +43,16 @@ $(DIST)/tutorial-board-$(VERSION).tar.gz:
 
 # oracle-corpus: every board, both views. The KiCad reader cross-check reads a schematic and its
 # board file and compares the two net sets, so it needs the copper half that the tutorial does not.
+#
+# The design.yaml descriptors ship here and NOT in tutorial-board. A descriptor names the board file
+# as a companion, and agni fails a read whose declared companion is missing, so a descriptor in the
+# schematics-only tarball would break every read of the tutorial board.
 $(DIST)/oracle-corpus-$(VERSION).tar.gz:
 	@mkdir -p $(DIST)
 	find boards -type f ! -name '._*' \
 	  \( -name '*.kicad_sch' -o -name '*.kicad_pcb' -o -name '*.kicad_pro' -o -name '*.kicad_dru' \
 	     -o -name '*.kicad_sym' -o -name '*.kicad_mod' -o -name '*-lib-table' \
-	     -o -name 'LICENSE' -o -name 'README.md' \) \
+	     -o -name 'design.yaml' -o -name 'LICENSE' -o -name 'README.md' \) \
 	  | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
 
 dist: $(DIST)/tutorial-board-$(VERSION).tar.gz $(DIST)/oracle-corpus-$(VERSION).tar.gz

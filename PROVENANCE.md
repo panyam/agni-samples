@@ -17,6 +17,7 @@ expected answer is "none".
 | Taken | 2026-09-07, from a KiCad 9 installation |
 | Modifications | **None.**  Design files are byte-identical to upstream. |
 | Not included | the `img/` renders from the upstream repo |
+| Added | `design.yaml`, agni's descriptor (Apache-2.0): the entry, the board as a companion, and which connectors are internal to the product |
 
 17 sheets, 1123 components, 1387 nets as KiCad resolves them.  Carries I2C, MDIO, PCIe, USB, CSI and
 DisplayPort, and an `MPN` property on every footprint.
@@ -31,6 +32,7 @@ DisplayPort, and an `MPN` property on every footprint.
 | Taken | 2026-09-07, from a KiCad 9 installation |
 | Modifications | **None** to any design file. |
 | Not included | `img/` renders, `.kicad_prl` and `.lck` editor state |
+| Added | `design.yaml` beside the Feather and beside the NFC antenna, agni's descriptors (Apache-2.0). The Feather's declares no board, because its `.kicad_pcb` does not parse (agni issue 681) |
 
 71 components on one sheet, with its symbol libraries in `lib/` and a `sym-lib-table`.
 
