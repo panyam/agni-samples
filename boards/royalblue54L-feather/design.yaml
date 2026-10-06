@@ -1,0 +1,17 @@
+# Added by agni, not part of the upstream design (see PROVENANCE.md). It says which file analysis
+# reads and which connectors stay inside the product.
+#
+# The board file is not declared as a companion. RoyalBlue54L-Feather.kicad_pcb is malformed (an
+# expression closes the file at line 627 and the rest is outside it, agni issue 681), and a declared
+# companion that does not parse fails every read of the design. Until it reads, this design has no
+# board tier and agni says which board rules did not run.
+name: royalblue54l-feather
+title: RoyalBlue54L Feather
+entry: RoyalBlue54L-Feather.kicad_sch
+
+# A Feather's headers, its USB-C port and its STEMMA QT port are all handled by the person using
+# it, so they stay undeclared and the exposure rules check them.
+intent:
+  components:
+    J4: {exposure: internal}   # battery connector, the cell sits with the board
+    J6: {exposure: internal}   # NFC antenna connector, cabled to the antenna flex

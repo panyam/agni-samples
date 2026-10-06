@@ -1,0 +1,10 @@
+# Added by agni, not part of the upstream design (see PROVENANCE.md).
+name: royalblue54l-nfc-antenna
+title: RoyalBlue54L NFC antenna
+entry: RoyalBlue54L-NFC-Antenna.kicad_sch
+companions:
+  - RoyalBlue54L-NFC-Antenna.kicad_pcb
+
+intent:
+  components:
+    J1: {exposure: internal}   # mates with the Feather's antenna connector

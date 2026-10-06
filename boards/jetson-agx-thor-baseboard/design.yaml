@@ -1,0 +1,25 @@
+# Added by agni, not part of the upstream design (see PROVENANCE.md). It says which file analysis
+# reads, which file is the same board's copper, and which connectors stay inside the product, so
+# agni reads the board the way a team declaring its own design would.
+name: jetson-agx-thor-baseboard
+title: Jetson AGX Thor baseboard
+entry: jetson-agx-thor-baseboard.kicad_sch
+companions:
+  - jetson-agx-thor-baseboard.kicad_pcb
+
+# Every connector is a way into the board unless declared otherwise, which is right for a cable
+# entry and wrong for a module socket. These are the ones that join this board to another part of
+# the same product. The USB-C ports, the SFP cage, the power entry and the two JST-SH I2C ports are
+# left undeclared, because a user plugs cables into them.
+intent:
+  components:
+    J1:  {exposure: internal}   # Jetson AGX Thor module, board-to-board
+    J8:  {exposure: internal}   # FMC+ expansion power, mates with J18's accessory
+    J18: {exposure: internal}   # FMC+ expansion mezzanine
+    J13: {exposure: internal}   # M.2 key-M, NVMe card
+    J14: {exposure: internal}   # M.2 key-E, wireless card
+    J10: {exposure: internal}   # CSI camera FFC, cabled to a camera inside the product
+    J11: {exposure: internal}   # CSI camera FFC
+    J15: {exposure: internal}   # fan
+    J4:  {exposure: internal}   # Tag-Connect debug pads, used in manufacturing
+    J20: {exposure: internal}   # Tag-Connect debug pads
