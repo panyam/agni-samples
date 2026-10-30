@@ -1,0 +1,8 @@
+# Added by agni, not part of the upstream design (see PROVENANCE.md). It says which file analysis
+# reads and which file is the same board's copper. No connector is declared internal yet, so the
+# exposure rules treat every connector as a way into the board.
+name: mnt-reform-motherboard30
+title: MNT Reform motherboard 3.0
+entry: reform2-motherboard30.kicad_sch
+companions:
+  - reform2-motherboard30.kicad_pcb
