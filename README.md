@@ -15,6 +15,10 @@ They live in their own repo so that the engine repo stays a single licence and t
 |---|---:|---:|---|
 | `jetson-agx-thor-baseboard` | 1123 | 17 | Apache-2.0 |
 | `royalblue54L-feather` | 71 | 1 | CERN-OHL-P |
+| `hackrf-one` | 418 | 4 | CERN-OHL-P |
+| `glasgow-revC3` | 257 | 3 | 0BSD |
+| `cynthion` | 348 | 17 | CERN-OHL-P |
+| `mnt-reform-motherboard30` | 529 | 13 | CERN-OHL-S |
 
 ## Using these from the engine
 
@@ -38,7 +42,7 @@ release rather than against a local rebuild, since archive metadata varies betwe
 
 1. **Check the licence, and stop if there is not one.**  A design shipped with no LICENSE file cannot
    be redistributed here whatever its origin.  Permissive and reciprocal open-hardware licences are
-   fine.  NonCommercial terms are not.
+   fine (PROVENANCE.md, "Reciprocal licences").  NonCommercial terms are not.
 2. Copy the design **verbatim**, including its `LICENSE` and `README.md`.  Some tests compare a read
    against the upstream tool's own output, so an edited file stops being usable as a reference.
 3. Drop editor state and renders (`.kicad_prl`, `.lck`, `img/`).  Keep symbol and footprint libraries,
