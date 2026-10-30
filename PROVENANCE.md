@@ -99,6 +99,36 @@ KiCad 8 format (`20231120`). 13 sheets, 529 components, 681 nets as KiCad 10 res
 "MNT" and "MNT Reform" marks are MNT Research's trademarks and are not licensed by CERN-OHL-S; the
 files are redistributed unmodified, which is what the marks permit.
 
+## ODB++ jobs (`odb/`)
+
+### foxBMS boards, written by Altium Designer (`odb/altium/foxbms/`)
+
+| | |
+|---|---|
+| Upstream | foxBMS 1, the battery management system by Fraunhofer IISB |
+| Source | https://github.com/foxBMS/foxbms-1, `hardware/<board>/<board>.zip` at commit `e6c9a20e6fbc`, the member `Fabrication/odb++/<name>.zip` |
+| Licence | CC-BY-4.0 (`odb/altium/foxbms/LICENSE`), the licence foxBMS states for its hardware and documentation |
+| Attribution | This product uses parts of foxBMS® (the phrase foxBMS asks for). |
+| Taken | 2026-10-30 |
+| Modifications | **None.**  Each `<board>.odb.zip` is the published ODB++ archive, byte-identical, renamed for the board it belongs to. |
+| Not included | the Altium sources, schematics PDFs, BOMs and Gerbers in the same packages |
+
+Five boards (extension, interface, master, the two slaves), 74 to 591 parts, 11 to 14 layers. They are
+the engine's first ODB++ jobs from a tool other than KiCad, so agni's gate reads them for the dialect
+KiCad's exporter never writes: feature groups, through-hole pads, silkscreen text records, no
+`misc/info`.
+
+### KiCad boards, exported by kicad-cli (`odb/kicad/`)
+
+| | |
+|---|---|
+| Upstream | the boards under `boards/`, each under its own licence above |
+| Made with | `kicad-cli pcb export odb --compression none --precision 6`, KiCad 10.0.6 (`make odb-kicad-jobs`) |
+| Modifications | **Derived.**  Each is KiCad's export of the board beside it, with the two export timestamps fixed so a regeneration is stable.  Its licence is the board's. |
+
+agni reads each board from its `.kicad_pcb` and from its export and requires the two to agree, so
+the source of the export is also its oracle.
+
 ## Reciprocal licences
 
 A strongly reciprocal licence (CERN-OHL-S, GPL) obliges whoever distributes a MODIFIED design or a
