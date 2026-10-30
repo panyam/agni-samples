@@ -20,6 +20,9 @@ They live in their own repo so that the engine repo stays a single licence and t
 | `cynthion` | 348 | 17 | CERN-OHL-P |
 | `mnt-reform-motherboard30` | 529 | 13 | CERN-OHL-S |
 
+ODB++ jobs sit apart, under `odb/` (see `PROVENANCE.md`): foxBMS's five boards as Altium Designer
+wrote them (CC-BY-4.0), and each KiCad board above as kicad-cli exports it.
+
 ## Using these from the engine
 
 The engine fetches a **pinned release tarball**, verified by checksum, into a gitignored directory.
@@ -31,8 +34,10 @@ Tarballs are built per purpose, so a job downloads only what it needs:
 |---|---|
 | `tutorial-board` | the Jetson baseboard, schematics only |
 | `oracle-corpus` | every board, schematics and board files |
+| `odb-altium` | ODB++ jobs Altium Designer wrote (the foxBMS boards), byte-identical to their publisher's |
+| `odb-kicad` | each board above exported to ODB++ by kicad-cli, for reading a board both ways |
 
-`make dist` builds both and writes `SHA256SUMS`.  `make list` prints the lines to pin.  `make verify`
+`make dist` builds them all and writes `SHA256SUMS`.  `make list` prints the lines to pin.  `make verify`
 checks a built set against its sums.
 
 Released artifacts are the pinned ones.  Verify a download against the `SHA256SUMS` attached to the

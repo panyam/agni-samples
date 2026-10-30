@@ -29,7 +29,7 @@ TAR_IDS := $(shell tar --version 2>/dev/null | grep -q 'GNU tar' \
              && echo "--owner=0 --group=0 --numeric-owner" \
              || echo "--uid 0 --gid 0 --uname '' --gname ''")
 
-.PHONY: all dist clean list verify
+.PHONY: all dist clean list verify odb-kicad-jobs
 
 all: dist
 
@@ -55,7 +55,22 @@ $(DIST)/oracle-corpus-$(VERSION).tar.gz:
 	     -o -name 'design.yaml' -o -name 'LICENSE' -o -name 'README.md' \) \
 	  | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
 
-dist: $(DIST)/tutorial-board-$(VERSION).tar.gz $(DIST)/oracle-corpus-$(VERSION).tar.gz
+# odb-altium: ODB++ jobs another tool wrote, byte-identical to their publishers' (foxBMS's, written by
+# Altium Designer). agni's gate reads them for the dialect KiCad's exporter never writes, so this one
+# stays small enough to fetch on every CI run.
+$(DIST)/odb-altium-$(VERSION).tar.gz:
+	@mkdir -p $(DIST)
+	find odb/altium -type f ! -name '._*' | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
+
+# odb-kicad: each KiCad board above exported to ODB++ by kicad-cli (odb-kicad-jobs). agni reads a
+# board both ways and requires the two to agree, which only makes sense beside oracle-corpus, so it
+# ships apart from the gate's artifacts.
+$(DIST)/odb-kicad-$(VERSION).tar.gz:
+	@mkdir -p $(DIST)
+	find odb/kicad -type f ! -name '._*' | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
+
+dist: $(DIST)/tutorial-board-$(VERSION).tar.gz $(DIST)/oracle-corpus-$(VERSION).tar.gz \
+      $(DIST)/odb-altium-$(VERSION).tar.gz $(DIST)/odb-kicad-$(VERSION).tar.gz
 	@cd $(DIST) && shasum -a 256 *-$(VERSION).tar.gz > SHA256SUMS
 	@echo
 	@echo "built $(VERSION):"
@@ -77,3 +92,22 @@ verify:
 
 clean:
 	rm -rf $(DIST)
+
+# Regenerates odb/kicad from the boards, with KiCad 9 or later. Precision 6 writes coordinates to the
+# nanometre. The exporter stamps the time it ran into two files of each job, and those stamps are
+# fixed so a regeneration with no board change rewrites nothing that matters; the .kicad_prl it
+# leaves beside a board with none is removed.
+ODB_BOARDS := $(shell find boards -name '*.kicad_pcb' ! -path '*/nfc_antenna/*' | sort)
+odb-kicad-jobs:
+	@command -v kicad-cli >/dev/null || { echo "kicad-cli not found" >&2; exit 1; }
+	@mkdir -p odb/kicad
+	@for b in $(ODB_BOARDS); do \
+	  name=$$(basename $$(dirname $$b)); tmp=$$(mktemp -d); \
+	  prl=$${b%.kicad_pcb}.kicad_prl; had=0; [ -e "$$prl" ] && had=1; \
+	  kicad-cli pcb export odb --compression none --precision 6 -o $$tmp/$$name $$b >/dev/null; \
+	  [ $$had = 1 ] || rm -f "$$prl"; \
+	  find $$tmp/$$name -type f -print0 | xargs -0 perl -pi -e \
+	    's/^# \d{4}-\d\d-\d\dT\d\d:\d\d:\d\d$$/# 2026-01-01T00:00:00/; s/^(CREATION|SAVE)_DATE=.*/$$1_DATE=20260101.000000/'; \
+	  (cd $$tmp && find $$name -type f | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9) > odb/kicad/$$name.odb.tgz; \
+	  rm -rf $$tmp; echo "wrote odb/kicad/$$name.odb.tgz"; \
+	done
