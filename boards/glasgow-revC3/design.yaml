@@ -1,8 +1,14 @@
 # Added by agni, not part of the upstream design (see PROVENANCE.md). It says which file analysis
 # reads and which file is the same board's copper. No connector is declared internal yet, so the
 # exposure rules treat every connector as a way into the board.
+#
+# params/ holds the datasheet facts agni's rules need about parts whose protection is built in, each
+# transcribed from the vendor's datasheet and citing its revision and page. U15's TPD3S014 limits the
+# current on the USB-C VBUS entry and blocks reverse current (agni issue 1248).
 name: glasgow-revc3
 title: Glasgow Interface Explorer revC3
 entry: glasgow.kicad_sch
 companions:
   - glasgow.kicad_pcb
+params:
+  - params

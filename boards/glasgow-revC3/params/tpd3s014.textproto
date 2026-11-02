@@ -1,0 +1,111 @@
+# TPD3S014, TI's current-limit switch with D+/D- ESD protection for USB ports, transcribed by hand from
+# its datasheet: TPD3S0x4, SLVSCP4B, October 2014, revised August 2015. Facts only, each row citing
+# its page and table. Glasgow revC3 places it as U15 between its USB-C VBUS (on IN) and its +5V rail
+# (on OUT).
+mpn: "TPD3S014DBVR"
+manufacturer: "Texas Instruments"
+device_class: "current limit switch"
+
+docs {
+  id: "slvscp4b"
+  title: "TPD3S0x4 Current Limit Switch and D+/D- ESD Protection for USB Host Ports, SLVSCP4B (revised August 2015)"
+  vendor: "Texas Instruments"
+  locator: "SLVSCP4B"
+}
+
+packages {
+  id: "dbv"
+  name: "DBV (SOT-23-6)"
+  mpn_suffix: "DBVR"
+}
+
+pins {
+  id: "en"
+  name: "EN"
+  function: PIN_FUNCTION_INPUT
+  description: "Enable input, logic high turns on power switch"
+  numbers { package_ref: "dbv" number: "1" }
+  prov { doc_ref: "slvscp4b" page: 3 table_or_figure: "Pin Functions" method: "hand" confidence: 1 }
+}
+
+pins {
+  id: "gnd"
+  name: "GND"
+  function: PIN_FUNCTION_GROUND
+  numbers { package_ref: "dbv" number: "2" }
+  prov { doc_ref: "slvscp4b" page: 3 table_or_figure: "Pin Functions" method: "hand" confidence: 1 }
+}
+
+pins {
+  id: "in"
+  name: "IN"
+  function: PIN_FUNCTION_POWER_INPUT
+  description: "Input voltage and power-switch drain"
+  numbers { package_ref: "dbv" number: "3" }
+  prov { doc_ref: "slvscp4b" page: 3 table_or_figure: "Pin Functions" method: "hand" confidence: 1 }
+}
+
+pins {
+  id: "out"
+  name: "OUT"
+  function: PIN_FUNCTION_POWER_OUTPUT
+  description: "Power-switch output, connect to load"
+  numbers { package_ref: "dbv" number: "4" }
+  prov { doc_ref: "slvscp4b" page: 3 table_or_figure: "Pin Functions" method: "hand" confidence: 1 }
+}
+
+pins {
+  id: "d1"
+  name: "D1"
+  function: PIN_FUNCTION_BIDIRECTIONAL
+  description: "USB data+ or USB data-"
+  numbers { package_ref: "dbv" number: "5" }
+  prov { doc_ref: "slvscp4b" page: 3 table_or_figure: "Pin Functions" method: "hand" confidence: 1 }
+}
+
+pins {
+  id: "d2"
+  name: "D2"
+  function: PIN_FUNCTION_BIDIRECTIONAL
+  description: "USB data+ or USB data-"
+  numbers { package_ref: "dbv" number: "6" }
+  prov { doc_ref: "slvscp4b" page: 3 table_or_figure: "Pin Functions" method: "hand" confidence: 1 }
+}
+
+parameters {
+  name: "Input voltage, VIN"
+  symbol: "VIN"
+  limit_kind: LIMIT_KIND_ABSOLUTE_MAX
+  value { min: -0.3 max: 6 }
+  unit: "V"
+  conditions { raw: "over operating free-air temperature (unless otherwise noted)" }
+  condition_coverage: CONDITION_COVERAGE_COMPLETE
+  pin_refs: "in"
+  prov { doc_ref: "slvscp4b" page: 4 table_or_figure: "7.1 Absolute Maximum Ratings" method: "hand" confidence: 1 }
+}
+
+parameters {
+  name: "Current limit"
+  symbol: "IOS"
+  limit_kind: LIMIT_KIND_CHARACTERISTIC
+  value { min: 0.67 typ: 0.85 max: 1.01 }
+  unit: "A"
+  conditions { symbol: "TA" eq: 25 unit: "C" raw: "TJ = TA = 25C, VIN = 5 V, VEN = VIN" }
+  condition_coverage: CONDITION_COVERAGE_COMPLETE
+  applies_to: "TPD3S014"
+  pin_refs: "out"
+  prov { doc_ref: "slvscp4b" page: 5 table_or_figure: "7.5 Electrical Characteristics: TJ = TA = 25C" method: "hand" confidence: 1 }
+}
+
+parameters {
+  name: "Reverse leakage current"
+  symbol: "IREV"
+  limit_kind: LIMIT_KIND_CHARACTERISTIC
+  value { typ: 0.2 max: 1 }
+  unit: "µA"
+  conditions { symbol: "TA" eq: 25 unit: "C" raw: "VOUT = 5 V, VIN = 0 V, measure IVOUT" }
+  condition_coverage: CONDITION_COVERAGE_COMPLETE
+  pin_refs: "in"
+  pin_refs: "out"
+  prov { doc_ref: "slvscp4b" page: 5 table_or_figure: "7.5 Electrical Characteristics: TJ = TA = 25C" method: "hand" confidence: 1 }
+}
