@@ -118,6 +118,23 @@ layers. They were the engine's first ODB++ jobs from a tool other than KiCad. ag
 for parts of the format that KiCad's exporter never writes, such as feature groups, through-hole
 pads and silkscreen text records, and for a job with no `misc/info`.
 
+### foxBMS boards as Altium saved them (`altium/foxbms/`)
+
+| | |
+|---|---|
+| Upstream | foxBMS 1, the battery management system by Fraunhofer IISB |
+| Source | https://github.com/foxBMS/foxbms-1, `hardware/<board>/<board>.zip` at commit `e6c9a20e6fbc`, the member `Sources/<name>.PcbDoc` |
+| Licence | CC-BY-4.0 (`altium/foxbms/LICENSE`), the licence foxBMS states for its hardware and documentation |
+| Attribution | This product uses parts of foxBMS® (the phrase foxBMS asks for). |
+| Taken | 2026-11-05 |
+| Modifications | **None.**  Each `.PcbDoc` is byte-identical to the member of its board's package. |
+| Not included | the schematics (`.SchDoc`), the project and variant files, PDFs and assembly files |
+
+The same five boards as `odb/altium/foxbms/`, as binary Altium board files. Each board's package
+holds its `.PcbDoc` and its ODB++ job side by side, and the job is byte-identical to the one in
+`odb-altium`. So agni's `.PcbDoc` reader is held to Altium's own export of the same board
+(panyam/agni#1349).
+
 ### KiCad boards, exported by kicad-cli (`odb/kicad/`)
 
 | | |
