@@ -44,8 +44,8 @@ OpenCellular breakout.  Each publisher also released an ODB++ job of the same bo
 `cadence/`, `allegro/`, `altium/` and `house/`, so `agni check mount://boards/hackrf-one` works at the
 root with no flags.
 Run it from the root.  agni finds `agni.yaml` from a subfolder too, but then reads its paths against
-the folder you're in.  You need agni v0.5.0 or later, the first release that reads Altium and
-Allegro boards.  It opens all five `.PcbDoc` boards and five of the eight Allegro `.brd` boards,
+the folder you're in.  You need agni v0.6.0 or later, the first release that reads OrCAD Capture
+designs, which Clay R6 is read from.  It opens all five `.PcbDoc` boards and five of the eight Allegro `.brd` boards,
 counting the two under `cadence/`.  BeaglePlay (Allegro 17.4), BeagleV-Fire (17.5) and pc069 were
 saved by releases agni does not read yet (agni issue 1355).
 

@@ -19,7 +19,7 @@ jobs:
   read:
     runs-on: ubuntu-latest
     env:
-      AGNI_VERSION: v0.5.0
+      AGNI_VERSION: v0.6.0
     steps:
       - uses: actions/checkout@v4
       - name: Fetch agni
