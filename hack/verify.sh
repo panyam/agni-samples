@@ -1,19 +1,21 @@
 #!/usr/bin/env bash
-# Checks the tree a checkout serves: hack/verify.sh [root]. With AGNI naming an agni binary, it also
+# Checks the tree a checkout serves: hack/verify.sh [root]. If AGNI names an agni binary, it also
 # reads every design through the root agni.yaml.
 #
 # Each folder under boards/ needs a design.yaml and its own "## <folder>" section in PROVENANCE.md.
-# Neither the root nor boards/ may hold a project.yaml: a design under one that does not `extends`
-# it fails to load, so a project.yaml there would break every board at once.
+# The folders under allegro/, odb/allegro/ and cadence/ have their own rules, below. Neither the
+# root nor boards/ may hold a project.yaml. agni fails to load a design that sits under a
+# project.yaml without naming it in `extends`, so a project.yaml there would break every board at
+# once.
 #
-# A read must find at least one component, as well as exit 0. An agni too old for a board's format
-# reads it as an empty design and exits 0, and the viewer then shows an empty page.
+# A read must exit 0 and find at least one component. An agni too old for a board's format reads it
+# as an empty design and still exits 0, and the viewer then shows an empty page.
 set -uo pipefail
 
 cd "${1:-.}" || exit 1
 fail=0
 bad() { echo "verify: $*" >&2; fail=1; }
-# The line of agni's output that says why a read failed: its first error, else its last line.
+# Picks the line of agni's output that says why a read failed: its first error, else its last line.
 why() { printf '%s\n' "$1" | grep -m1 '^error' || printf '%s\n' "$1" | tail -1; }
 
 for d in boards/*/; do
@@ -38,10 +40,10 @@ for p in project.yaml boards/project.yaml; do
   [ -e "$p" ] && bad "$p would become the project of every board, and no board extends it"
 done
 
-# A team's house boards stay out of this public repo. Only the README and the template are tracked
-# under house/, and no tracked file may name a mount beyond the four agni.yaml declares, since one
-# naming mount://<team-folder> is a house path on its way to being pushed. Both read git's index, so
-# they also see what is staged, which is what the pre-commit hook needs.
+# A team's house boards must not reach this public repo. Only the README and the template are
+# tracked under house/. No tracked file may name a mount beyond the four agni.yaml declares. A file
+# that names mount://<team-folder> points into a team's own boards, and is about to be pushed. Both
+# checks read git's index, so they also see what is staged. The pre-commit hook relies on that.
 if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   while IFS= read -r f; do
     case $f in
@@ -58,7 +60,7 @@ fi
 
 if [ -n "${AGNI:-}" ]; then
   # house/ is read too, so a team's own boards get the same check. When HOUSE_DIR moves it, every
-  # read names all four mounts, because a --mount replaces agni.yaml's whole table.
+  # read names all four mounts, because one --mount replaces agni.yaml's whole table.
   house=${HOUSE_DIR:-house}
   mounts=()
   [ "$house" = house ] || mounts=(--mount boards=boards --mount odb=odb --mount cadence=cadence --mount "house=$house")

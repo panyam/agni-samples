@@ -1,5 +1,5 @@
-# A query set for the public boards: `make query DESIGN=... SET=examples/queries.yaml`. A house
-# board's project keeps its own sets under queries/, and SET can name one of those instead.
+# A query set for the public boards, run with `make query DESIGN=... SET=examples/queries.yaml`. A
+# house board's project keeps its own sets under queries/, and SET can name one of those instead.
 title: Power and probing
 queries:
   - name: Rails

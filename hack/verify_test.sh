@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Builds small trees, each with one fault, and checks that hack/verify.sh rejects every one and passes
-# the clean tree. With AGNI set it also checks the read half: a design that reads as zero components
+# the clean tree. With AGNI set it also checks the reads. A design that reads as zero components
 # fails, and a real board passes.
 set -uo pipefail
 
@@ -11,8 +11,8 @@ work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 failures=0
 
-# A tree with one well-formed board. The board's design.yaml names no entry file, so it is only fit
-# for the structural checks; the AGNI cases below build their own.
+# A tree with one well-formed board. The board's design.yaml names an entry file that doesn't exist,
+# so the tree only suits the structural checks. The AGNI cases below build their own.
 clean_tree() {
   local t=$1
   mkdir -p "$t/boards/alpha" "$t/odb"

@@ -1,10 +1,10 @@
-# Added by agni, not part of the upstream design (see PROVENANCE.md). It says which file analysis
-# reads and which file is the same board's copper. No connector is declared internal yet, so the
-# exposure rules treat every connector as a way into the board.
+# Added by agni, not part of the upstream design (see PROVENANCE.md). It names the file analysis
+# reads, and the file that holds the same board's copper. No connector is declared internal yet, so
+# the exposure rules treat every connector as a way into the board.
 #
-# params/ holds the datasheet facts agni's rules need about parts whose protection is built in, each
-# transcribed from the vendor's datasheet and citing its revision and page. U15's TPD3S014 limits the
-# current on the USB-C VBUS entry and blocks reverse current (agni issue 1248).
+# params/ holds datasheet facts for parts with built-in protection, which agni's rules need. Each
+# fact is transcribed from the vendor's datasheet and cites its revision and page. U15's TPD3S014
+# limits the current on the USB-C VBUS entry and blocks reverse current (agni issue 1248).
 name: glasgow-revc3
 title: Glasgow Interface Explorer revC3
 entry: glasgow.kicad_sch
@@ -13,11 +13,12 @@ companions:
 params:
   - params
 
-# The FX2's pin map, as Glasgow's own firmware drives it: firmware/fx2/glasgow_gpio.h and the FX2's
-# dedicated I2C pins, at the same commit as the board (d0fbcf28). The map comes from the firmware
-# rather than from this schematic, so `make pinmap` checks that the two agree. Rows take the revC
-# definitions. PB2-PB4 are left out, since revC reuses them as FIFO data lines D2-D4. A far end is
-# declared where the enable or FPGA pin it drives is a single part away.
+# The FX2's pin map, as Glasgow's own firmware drives it. The rows come from
+# firmware/fx2/glasgow_gpio.h and the FX2's dedicated I2C pins, at the same commit as the board
+# (d0fbcf28). The map comes from the firmware rather than from this schematic, so `make pinmap`
+# checks that the two agree. Rows take the revC definitions. PB2-PB4 are left out, since revC reuses
+# them as FIFO data lines D2-D4. A row declares a far end when the pin drives an enable or an FPGA
+# pin a single part away.
 intent:
   io_map:
     - {net: "/~{ALERT}",      device: U1, pin: PA0}                                 # PINA_nALERT

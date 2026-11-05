@@ -14,7 +14,8 @@ jobs:
       - run: make verify
       - run: make test
 
-  # Every design read by the oldest agni the README names. Raise AGNI_VERSION with that floor.
+  # Reads every design with the oldest agni the README supports. Raise AGNI_VERSION when the README
+  # raises that floor.
   read:
     runs-on: ubuntu-latest
     env:

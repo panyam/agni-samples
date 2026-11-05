@@ -1,8 +1,8 @@
 # A review checklist for the public boards. They belong to no project, so `make review` names this
 # file. A house board's project can carry its own (house/_template/project.yaml.example).
 #
-# Each item is bound to one agni rule, an inline query, or nothing. An item bound to nothing is
-# reported as not automated, so the coverage counts what was asked as well as what was answered.
+# Each item is bound to one agni rule, to an inline query, or to nothing. agni reports an item bound
+# to nothing as not automated. So the coverage counts what was asked, as well as what was answered.
 name: Public board review
 areas:
   - name: Power
