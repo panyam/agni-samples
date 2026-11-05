@@ -53,21 +53,27 @@ if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   done < <(git ls-files -- house)
 
   while IFS= read -r hit; do
-    bad "$hit names a mount other than boards, odb, cadence or house"
+    bad "$hit names a mount other than boards, odb, cadence, allegro, altium or house"
   done < <(git ls-files -z | xargs -0 grep -IHnoE 'mount://[A-Za-z0-9][A-Za-z0-9_.-]*' 2>/dev/null \
-             | grep -vE ':mount://(boards|odb|cadence|house)$')
+             | grep -vE ':mount://(boards|odb|cadence|allegro|altium|house)$')
 fi
 
 if [ -n "${AGNI:-}" ]; then
   # house/ is read too, so a team's own boards get the same check. When HOUSE_DIR moves it, every
-  # read names all four mounts, because one --mount replaces agni.yaml's whole table.
+  # read names all six mounts, because one --mount replaces agni.yaml's whole table.
   house=${HOUSE_DIR:-house}
   mounts=()
-  [ "$house" = house ] || mounts=(--mount boards=boards --mount odb=odb --mount cadence=cadence --mount "house=$house")
+  [ "$house" = house ] || mounts=(--mount boards=boards --mount odb=odb --mount cadence=cadence --mount allegro=allegro --mount altium=altium --mount "house=$house")
   designs=$(find boards cadence -name design.yaml ! -path '*/._*' -exec dirname {} \; 2>/dev/null | sort)
   house_designs=$(find "$house" -name design.yaml ! -path '*/._*' ! -path '*/_template/*' -exec dirname {} \; 2>/dev/null | sort)
   jobs=$(find odb -type f \( -name '*.odb.tgz' -o -name '*.odb.zip' \) ! -name '._*' 2>/dev/null | sort)
-  uris=$(for p in $designs $jobs; do echo "mount://$p"; done
+  # A native board is read by its own name. pc069, BeaglePlay and BeagleV-Fire were saved by Allegro
+  # releases agni does not read yet (agni issue 1355), so they are left out until it does.
+  natives=$(find altium -name '*.PcbDoc' ! -name '._*' 2>/dev/null
+            find allegro -name '*.brd' ! -name '._*' ! -path 'allegro/pc069/*' ! -path 'allegro/beagleplay/*' \
+              ! -path 'allegro/beaglev-fire/*' 2>/dev/null)
+  natives=$(printf '%s\n' "$natives" | sort)
+  uris=$(for p in $designs $jobs $natives; do echo "mount://$p"; done
          for p in $house_designs; do echo "mount://house/${p#"$house"/}"; done)
   for uri in $uris; do
     if ! out=$("$AGNI" stats ${mounts[@]+"${mounts[@]}"} "$uri" 2>&1); then

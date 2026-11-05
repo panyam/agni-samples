@@ -7,4 +7,6 @@ mounts:
   boards: boards
   odb: odb
   cadence: cadence
+  allegro: allegro
+  altium: altium
   house: house
