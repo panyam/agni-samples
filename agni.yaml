@@ -1,0 +1,6 @@
+# agni reads this file from the checkout, so `agni serve` and `agni check mount://boards/<board>` work
+# here with no flags. It may use only the keys every released agni knows (mounts, symbol_paths,
+# web_dir, native_tools), because an agni that meets an unknown key refuses to start.
+mounts:
+  boards: boards
+  odb: odb

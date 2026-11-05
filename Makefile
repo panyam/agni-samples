@@ -29,9 +29,47 @@ TAR_IDS := $(shell tar --version 2>/dev/null | grep -q 'GNU tar' \
              && echo "--owner=0 --group=0 --numeric-owner" \
              || echo "--uid 0 --gid 0 --uname '' --gname ''")
 
-.PHONY: all dist clean list verify odb-kicad-jobs
+.PHONY: all dist clean list verify verify-dist test serve serve-wasm site odb-kicad-jobs
 
 all: dist
+
+# Serving the checkout. AGNI is the agni binary. A release binary carries the viewer. A dev build
+# (`make agni` in an agni checkout) carries none, so name its web/ too:
+#   make serve AGNI=../agni/bin/agni WEB_DIR=../agni/web
+# MCP=1 also serves agni's analysis to an agent at /mcp.
+AGNI     ?= agni
+PORT     ?= 8080
+WEB_DIR  ?=
+SITE_DIR ?= site
+MOUNTS   := --mount boards=boards --mount odb=odb
+WEB_FLAG  = $(if $(WEB_DIR),--web-dir $(WEB_DIR))
+SERVE     = $(AGNI) serve $(MOUNTS) --addr 127.0.0.1:$(PORT) $(WEB_FLAG) $(if $(MCP),--mcp)
+
+serve:
+	$(SERVE)
+
+# The same, with each design analysed in the browser. A design over serve's --wasm-max-bytes goes to
+# the server engine, and the page says so.
+serve-wasm:
+	$(SERVE) --engine wasm
+
+# The whole set as static files, the way agni's public demo is built, for any static server:
+#   make site && python3 -m http.server -d site
+# The viewer needs a web/ with the wasm engine built (`make ui wasm` in an agni checkout).
+site:
+	$(AGNI) site $(SITE_DIR) $(WEB_FLAG) \
+	  $(foreach b,$(notdir $(wildcard boards/*)),--seed $(b)=boards/$(b)) --seed odb=odb
+
+# Each board folder has a design.yaml and a PROVENANCE.md section, and no project.yaml sits over
+# them. Name an agni to read every design too: make verify AGNI=agni. Without one the reads are
+# skipped, since the default AGNI need not exist. `make test` checks verify itself the same way.
+READ_AGNI = $(if $(filter command% environment%,$(origin AGNI)),$(AGNI))
+
+verify:
+	@AGNI=$(READ_AGNI) hack/verify.sh
+
+test:
+	@AGNI=$(READ_AGNI) hack/verify_test.sh
 
 # tutorial-board: schematics only, no board file. The docsite ladder never reads copper, and the
 # Jetson board file is 81MB, so shipping it here would multiply every tutorial CI run by twenty.
@@ -86,7 +124,7 @@ list: dist
 	@echo "engine pin:"
 	@awk '{printf "  %s  %s\n", $$1, $$2}' $(DIST)/SHA256SUMS
 
-verify:
+verify-dist:
 	@cd $(DIST) && shasum -a 256 -c SHA256SUMS
 	@for f in $(DIST)/*-$(VERSION).tar.gz; do \
 	  if tar -tzf $$f | grep -q '\(^\|/\)\._'; then echo "$$f carries AppleDouble files"; exit 1; fi; \
