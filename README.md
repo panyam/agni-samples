@@ -21,7 +21,11 @@ They live in their own repo so that the engine repo stays a single licence and t
 | `mnt-reform-motherboard30` | 529 | 13 | CERN-OHL-S |
 
 ODB++ jobs sit apart, under `odb/` (see `PROVENANCE.md`): foxBMS's five boards as Altium Designer
-wrote them (CC-BY-4.0), and each KiCad board above as kicad-cli exports it.
+wrote them (CC-BY-4.0), three boards as Allegro's tools wrote them (CERN-OHL-S, CC-BY-4.0, OCP
+permissive), and each KiCad board above as kicad-cli exports it.
+
+Cadence's other exports sit under `cadence/`, each with a `design.yaml`: the Parallella parasdr as
+Allegro wrote it to IPC-2581 (CC BY-SA 3.0 US), and Clay R6 as OrCAD Capture wrote it to EDIF (MIT).
 
 Allegro boards sit under `allegro/`, each as BeagleBoard.org published it (CC-BY-4.0).  The
 BeagleBone AI comes with an extract Allegro wrote from it.  BeaglePlay, BeagleV-Fire and BeagleBone
@@ -31,7 +35,9 @@ placement report.  Their `.brd` files span the three header families BeagleBoard
 ## Opening them in agni
 
 A checkout is something `agni serve` can open as it stands.  `agni.yaml` at the root mounts `boards/`,
-`odb/` and `house/`, so `agni check mount://boards/hackrf-one` works from anywhere inside it with no flags.
+`odb/`, `cadence/` and `house/`, so `agni check mount://boards/hackrf-one` works at the root with no
+flags.  Run it from the root: agni finds `agni.yaml` from a subfolder too, but reads its paths
+against the folder you're in.
 You need agni v0.4.0 or later, the first release with the ODB++ reader.
 
 ```bash
@@ -96,6 +102,7 @@ Tarballs are built per purpose, so a job downloads only what it needs:
 | `odb-altium` | ODB++ jobs Altium Designer wrote (the foxBMS boards), byte-identical to their publisher's |
 | `odb-kicad` | each board above exported to ODB++ by kicad-cli, for reading a board both ways |
 | `allegro` | the BeagleBone AI's Allegro `.brd`, with the extract Allegro wrote from the same board |
+| `cadence-exports` | ODB++ jobs Allegro's tools wrote (`odb/allegro/`), and the IPC-2581 and EDIF exports under `cadence/` |
 | `allegro-boards` | three more Allegro `.brd` boards, with the Gerbers, drill files, placement report and OrCAD schematics Allegro and OrCAD wrote beside them |
 
 `make dist` builds them all and writes `SHA256SUMS`.  `make list` prints the lines to pin.  `make

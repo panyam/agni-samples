@@ -129,6 +129,57 @@ KiCad's exporter never writes: feature groups, through-hole pads, silkscreen tex
 agni reads each board from its `.kicad_pcb` and from its export and requires the two to agree, so
 the source of the export is also its oracle.
 
+### Allegro jobs (`odb/allegro/`)
+
+ODB++ jobs that came out of Cadence Allegro, each byte-identical to the file its publisher released,
+checked against git's blob hash or, for the Git LFS file, the pointer's sha256. Each job's
+`misc/info` names an Allegro extract as its source. They differ in what wrote the job file itself,
+which the `SAVE_APP` line records, so the three together cover Allegro's own ODB++ writer and the two
+Valor tools that turn an Allegro extract into a job. Files are renamed to `<name>.odb.tgz`, the
+convention `odb/` uses.
+
+### pc069 rev c, written by Allegro (`odb/allegro/pc069/`)
+
+| | |
+|---|---|
+| Upstream | DUNE Timing System reference hardware FMC (pc069), University of Bristol HEP |
+| Source | [uob-hep-cad/uob-hep-pc069](https://github.com/uob-hep-cad/uob-hep-pc069), `hardware/Manufacturing/artwork/pc069c_25-manufacturing-artwork-2025-02-06/pc069c_toplevel_25.tgz`, commit `d86f9c06` |
+| Licence | CERN-OHL-S-2.0 (`odb/allegro/pc069/LICENSE`, the repo's own) |
+| Taken | 2026-11-05 |
+| Modifications | **None.**  Renamed to `pc069c_toplevel_25.odb.tgz`. |
+| Not included | the `.brd`, the `pst*.dat` packager netlist, the PDFs, and the older pc069b_16 and pc069c_23 jobs |
+
+`SAVE_APP=ODB++ Cadence Allegro 2409.0000`, written 2025-02-06, ODB++ 8. agni reads 197 components,
+123 nets and 19 layers.
+
+### OpenCellular breakout board (`odb/allegro/opencellular-breakout/`)
+
+| | |
+|---|---|
+| Upstream | OpenCellular Connect-1 breakout board, Telecom Infra Project |
+| Source | [Telecominfraproject/OpenCellular](https://github.com/Telecominfraproject/OpenCellular), `electronics/breakout/odb++/odbjob.tgz`, commit `0d5d7b00` |
+| Licence | CC-BY-4.0 (`odb/allegro/opencellular-breakout/LICENSE`, the repo's `LICENSE-HARDWARE`) |
+| Taken | 2026-11-05 |
+| Modifications | **None.**  Renamed to `opencellular-breakout.odb.tgz`. |
+| Not included | the `.brd`, the OrCAD `.DSN`, and the repo's other ten ODB++ jobs. Two of those came from Xpedition and PADS rather than Allegro |
+
+`SAVE_APP=ODB++ Viewer 9.6`, written 2017-01-05, ODB++ 8. agni reads 68 components, 75 nets and 15
+layers.
+
+### Zaius LOM/VGA card (`odb/allegro/zaius-lv-card/`)
+
+| | |
+|---|---|
+| Upstream | Zaius / Barreleye G2 LOM and VGA card (EVT), contributed to the Open Compute Project |
+| Source | [opencomputeproject/zaius-barreleye-g2](https://github.com/opencomputeproject/zaius-barreleye-g2), `HW/EE/GBR/EVT/LOM_VGA Card/Zaius-EVT-LAYOUT-LV_Card-ODB-X00-20160824-Final.zip` (Git LFS), commit `125c5c26` |
+| Licence | OCP Hardware License-Permissive 1.0 (`odb/allegro/zaius-lv-card/LICENSE`, the repo's `license.md`) |
+| Taken | 2026-11-05 |
+| Modifications | **None** to the job.  The upstream zip is a release package holding the job as `Zaius-EVT-LV_Card-X00_V6.tgz` beside two PDFs. That inner file is kept with its bytes unchanged, renamed to `zaius-lv-card.odb.tgz` (sha256 `d91d00a1`). |
+| Not included | the package's two PDFs (the PCBA drawing and the stackup report), and the repo's four other jobs, 6 to 64MB each |
+
+`SAVE_APP=Valor NPI 9.2.0 Update 1`, written 2016-08-24, ODB++ 6. agni reads 34 components, 39 nets
+and 12 layers.
+
 ## Allegro boards (`allegro/`)
 
 ### BeagleBone AI (`allegro/beaglebone-ai/`)
@@ -211,6 +262,46 @@ record "Cadence Allegro 17.4-S031", written 2023-09-26.
 
 `.brd` header `00 04 14 00`. The placement report is Allegro's Component Report: 1166 components, each
 with its device, package, position, rotation and side.
+
+## Cadence exports (`cadence/`)
+
+Designs as Cadence's tools exported them, in formats agni reads today. Each has a `design.yaml`
+naming the export as its entry, so the `cadence` mount serves it like a board.
+
+### Parallella parasdr (`cadence/parallella-parasdr/`)
+
+| | |
+|---|---|
+| Upstream | Parallella parasdr, a software-defined radio board from the Parallella project |
+| Source | [parallella/parallella-hw](https://github.com/parallella/parallella-hw), `parasdr/mfg/parasdr_ipc2581.xml` and `parasdr/mfg/parasdr_odb++.xml`, commit `a6bcdf84` |
+| Licence | CC BY-SA 3.0 US (`cadence/parallella-parasdr/LICENSE`, the repo's own) |
+| Copyright | (c) 2016 Parallella Foundation |
+| Taken | 2026-11-05 |
+| Modifications | **None.**  Both files are byte-identical to upstream. |
+| Not included | the `.brd`, Gerbers, and the repo's four Allegro ODB++ jobs for its other boards |
+| Added | `design.yaml`, agni's descriptor (Apache-2.0) |
+
+`parasdr_ipc2581.xml` is IPC-2581 revision B. Its header names `<SoftwarePackage name="Allegro"
+vendor="Cadence">`. agni reads 404 components, 157 nets and 19 layers. `parasdr_odb++.xml` is the same
+board as ODB++X (ODX), written by "UNDISCLOSED Allegro SPB16.6" on 2014-08-22. agni has no ODX
+reader yet, so the descriptor doesn't name it. With one, the two files would hold each other to the
+same board.
+
+### Clay R6 (`cadence/clay-r6/`)
+
+| | |
+|---|---|
+| Upstream | Clay, revision 6, by Michael Gubbels |
+| Source | [ah-cog/Clay](https://github.com/ah-cog/Clay), `Circuit/R6_1/CLAYR6.EDF`, commit `31a84237` |
+| Licence | MIT (`cadence/clay-r6/LICENSE`, the repo's own) |
+| Copyright | (c) 2014 Michael Gubbels |
+| Taken | 2026-11-05 |
+| Modifications | **None.**  The file is byte-identical to upstream. |
+| Not included | the OrCAD `.DSN`, the Allegro `.brd`, and the firmware |
+| Added | `design.yaml`, agni's descriptor (Apache-2.0) |
+
+EDIF 2.0.0 from OrCAD Capture: `program "cap2edif"`, `dataOrigin "OrCAD Capture"`, SPB 16.60. agni
+reads 74 components and 52 nets.
 
 ## Reciprocal licences
 

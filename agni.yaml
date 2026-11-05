@@ -6,4 +6,5 @@
 mounts:
   boards: boards
   odb: odb
+  cadence: cadence
   house: house
