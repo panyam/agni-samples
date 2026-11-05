@@ -23,6 +23,15 @@ for d in boards/*/; do
   grep -qxF "## $name" PROVENANCE.md 2>/dev/null || bad "boards/$name has no '## $name' section in PROVENANCE.md"
 done
 
+# An Allegro board has no design.yaml, since agni can't read a .brd yet. It still needs the
+# publisher's licence beside it and a PROVENANCE.md heading naming its folder.
+for d in allegro/*/; do
+  [ -d "$d" ] || continue
+  dir=${d%/}
+  [ -f "$dir/LICENSE" ] || bad "$dir has no LICENSE"
+  grep -qE "^#+ .*\(\`$dir/\`\)" PROVENANCE.md 2>/dev/null || bad "$dir has no PROVENANCE.md heading naming (\`$dir/\`)"
+done
+
 for p in project.yaml boards/project.yaml; do
   [ -e "$p" ] && bad "$p would become the project of every board, and no board extends it"
 done
