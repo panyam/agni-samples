@@ -46,11 +46,18 @@ if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
 fi
 
 if [ -n "${AGNI:-}" ]; then
+  # house/ is read too, so a team's own boards get the same check. When HOUSE_DIR moves it, every
+  # read names all three mounts, because a --mount replaces agni.yaml's whole table.
+  house=${HOUSE_DIR:-house}
+  mounts=()
+  [ "$house" = house ] || mounts=(--mount boards=boards --mount odb=odb --mount "house=$house")
   designs=$(find boards -name design.yaml ! -path '*/._*' -exec dirname {} \; 2>/dev/null | sort)
+  house_designs=$(find "$house" -name design.yaml ! -path '*/._*' ! -path '*/_template/*' -exec dirname {} \; 2>/dev/null | sort)
   jobs=$(find odb -type f \( -name '*.odb.tgz' -o -name '*.odb.zip' \) ! -name '._*' 2>/dev/null | sort)
-  for path in $designs $jobs; do
-    uri=mount://$path
-    if ! out=$("$AGNI" stats "$uri" 2>&1); then
+  uris=$(for p in $designs $jobs; do echo "mount://$p"; done
+         for p in $house_designs; do echo "mount://house/${p#"$house"/}"; done)
+  for uri in $uris; do
+    if ! out=$("$AGNI" stats ${mounts[@]+"${mounts[@]}"} "$uri" 2>&1); then
       bad "$uri does not read: $(why "$out")"
       continue
     fi
@@ -59,7 +66,7 @@ if [ -n "${AGNI:-}" ]; then
       bad "$uri reads as zero components; $("$AGNI" version | head -1) may be too old for it"
       continue
     fi
-    if ! out=$("$AGNI" check "$uri" 2>&1 >/dev/null); then
+    if ! out=$("$AGNI" check ${mounts[@]+"${mounts[@]}"} "$uri" 2>&1 >/dev/null); then
       bad "agni check $uri failed: $(why "$out")"
       continue
     fi

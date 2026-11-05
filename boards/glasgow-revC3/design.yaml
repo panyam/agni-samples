@@ -12,3 +12,22 @@ companions:
   - glasgow.kicad_pcb
 params:
   - params
+
+# The FX2's pin map, as Glasgow's own firmware drives it: firmware/fx2/glasgow_gpio.h and the FX2's
+# dedicated I2C pins, at the same commit as the board (d0fbcf28). The map comes from the firmware
+# rather than from this schematic, so `make pinmap` checks that the two agree. Rows take the revC
+# definitions. PB2-PB4 are left out, since revC reuses them as FIFO data lines D2-D4. A far end is
+# declared where the enable or FPGA pin it drives is a single part away.
+intent:
+  io_map:
+    - {net: "/~{ALERT}",      device: U1, pin: PA0}                                 # PINA_nALERT
+    - {net: "/~{FPGA_RESET}", device: U1, pin: PA1, to: {device: U30, pin: L9}}   # PINA_FPGA_nRESET_REVCD
+    - {net: /FPGA_DONE,       device: U1, pin: PA3, to: {device: U30, pin: K8}}   # PINA_FPGA_DONE
+    - {net: /ENVA,            device: U1, pin: PD0, to: {device: U31, pin: '3'}}  # PIND_EN_VA
+    - {net: /LED_CY,          device: U1, pin: PD2}                                 # PIND_LED_FX2
+    - {net: /LED_FPGA,        device: U1, pin: PD3}                                 # PIND_LED_ICE_REVABC
+    - {net: /LED_ACT,         device: U1, pin: PD4}                                 # PIND_LED_ACT
+    - {net: /LED_ERR,         device: U1, pin: PD5}                                 # PIND_LED_ERR
+    - {net: /ENVB,            device: U1, pin: PD6, to: {device: U14, pin: '3'}}  # PIND_EN_VB
+    - {net: /SCL,             device: U1, pin: SCL}
+    - {net: /SDA,             device: U1, pin: SDA}

@@ -18,7 +18,7 @@ clean_tree() {
   mkdir -p "$t/boards/alpha" "$t/odb"
   printf 'name: alpha\nentry: alpha.kicad_sch\n' > "$t/boards/alpha/design.yaml"
   printf '# Provenance\n\n## alpha\n\nfrom somewhere\n' > "$t/PROVENANCE.md"
-  printf 'mounts:\n  boards: boards\n  odb: odb\n' > "$t/agni.yaml"
+  printf 'mounts:\n  boards: boards\n  odb: odb\n  house: house\n' > "$t/agni.yaml"
   mkdir -p "$t/house/_template"
   printf 'house\n' > "$t/house/README.md"
   printf 'name: house\n' > "$t/house/_template/project.yaml.example"
@@ -89,6 +89,21 @@ if [ -n "${AGNI:-}" ]; then
   printf '(kicad_sch (version 20231120) (generator "eeschema") (uuid "00000000-0000-0000-0000-000000000000") (paper "A4"))\n' \
     > "$t/boards/alpha/alpha.kicad_sch"
   expect fail "a design that reads as zero components" "$t" "$AGNI"
+
+  t=$work/house-read; clean_tree "$t"; rm -r "$t/boards/alpha"; cp -R "$repo/boards/glasgow-revC3" "$t/house/acme-io"
+  expect pass "a house board reads" "$t" "$AGNI"
+
+  t=$work/house-empty; clean_tree "$t"; rm -r "$t/boards/alpha"; mkdir -p "$t/house/widget"
+  printf 'name: widget\nentry: widget.kicad_sch\n' > "$t/house/widget/design.yaml"
+  printf '(kicad_sch (version 20231120) (generator "eeschema") (uuid "00000000-0000-0000-0000-000000000000") (paper "A4"))\n' \
+    > "$t/house/widget/widget.kicad_sch"
+  expect fail "a house board that reads as zero components" "$t" "$AGNI"
+
+  t=$work/house-elsewhere; clean_tree "$t"; rm -r "$t/boards/alpha"; mkdir -p "$work/elsewhere/widget"
+  printf 'name: widget\nentry: widget.kicad_sch\n' > "$work/elsewhere/widget/design.yaml"
+  printf '(kicad_sch (version 20231120) (generator "eeschema") (uuid "00000000-0000-0000-0000-000000000000") (paper "A4"))\n' \
+    > "$work/elsewhere/widget/widget.kicad_sch"
+  HOUSE_DIR=$work/elsewhere expect fail "a house board in HOUSE_DIR that reads as zero components" "$t" "$AGNI"
 
   t=$work/bad-odb; clean_tree "$t"; rm -r "$t/boards/alpha"; : > "$t/PROVENANCE.md"
   mkdir -p "$t/odb/kicad"; printf 'not a tarball' > "$t/odb/kicad/broken.odb.tgz"

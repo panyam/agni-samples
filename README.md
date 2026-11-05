@@ -45,8 +45,8 @@ In `serve-wasm` a design bigger than serve's `--wasm-max-bytes` (128 MB) goes to
 and the page says so.  Jetson is about 92 MB, so every board here runs in the browser.
 
 `make verify` checks that each board folder has a `design.yaml` and a `PROVENANCE.md` section, and
-that no `project.yaml` sits over the boards.  `make verify AGNI=agni` also reads every board and job
-and fails on one that reads as no components.  `make test` checks those checks.  CI runs both.
+that no `project.yaml` sits over the boards.  `make verify AGNI=agni` also reads every board, job
+and house board, and fails on one that reads as no components.  `make test` checks those checks.  CI runs both.
 
 ## Your own boards beside these
 

@@ -63,7 +63,7 @@ KiCad 6 format (schematic `20211123`, board `20211014`). 4 sheets, 418 component
 | Taken | 2026-10-30 |
 | Modifications | **None** to any design file. |
 | Not included | `output/` fabrication outputs and renders, `.kicad_prl`. The shared `hardware/symbols` and `hardware/footprints` libraries the lib tables name at `../../` are not included; the schematic embeds every symbol it places and the board every footprint |
-| Added | `design.yaml`, agni's descriptor (Apache-2.0); `README.md` is the repo root's; `params/tpd3s014.textproto` (Apache-2.0), facts transcribed by hand from TI's TPD3S0x4 datasheet SLVSCP4B (revised August 2015), each citing its page |
+| Added | `design.yaml`, agni's descriptor (Apache-2.0); `README.md` is the repo root's; `params/tpd3s014.textproto` (Apache-2.0), facts transcribed by hand from TI's TPD3S0x4 datasheet SLVSCP4B (revised August 2015), each citing its page; an `io_map` in `design.yaml`, the FX2's pin assignments as Glasgow's firmware makes them (`firmware/fx2/glasgow_gpio.h` at the same commit) |
 
 KiCad 7 format (`20230121`). 3 sheets, 257 components, 251 nets as KiCad 10 resolves them.
 

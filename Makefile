@@ -71,7 +71,7 @@ site:
 READ_AGNI = $(if $(filter command% environment%,$(origin AGNI)),$(AGNI))
 
 verify:
-	@AGNI=$(READ_AGNI) hack/verify.sh
+	@AGNI=$(READ_AGNI) HOUSE_DIR=$(HOUSE_DIR) hack/verify.sh
 
 test:
 	@AGNI=$(READ_AGNI) hack/verify_test.sh
@@ -149,7 +149,8 @@ trial: | $(REPORTS)
 
 # Every target above on Glasgow, so a team sees each output before adding a board. The trace runs
 # from the microcontroller pin that enables port B's I/O supply, through R26, to the regulator's EN.
-# The diff compares Glasgow's schematic with its kicad-cli ODB++ export.
+# The diff compares Glasgow's schematic with its kicad-cli ODB++ export. The pin map is the one
+# Glasgow's firmware drives, declared in its design.yaml.
 TOUR := mount://boards/glasgow-revC3
 tour:
 	@echo "== check";   $(MAKE) -s check   DESIGN=$(TOUR)
@@ -160,7 +161,7 @@ tour:
 	@echo "== lexicon"; $(MAKE) -s lexicon DESIGN=$(TOUR)
 	@echo "== intake";  $(MAKE) -s intake  DESIGN=$(TOUR)
 	@echo "== trial";   $(MAKE) -s trial   DESIGN=$(TOUR)
-	@echo "== pinmap: skipped, since no public board declares an io_map yet"
+	@echo "== pinmap";  $(MAKE) -s pinmap  DESIGN=$(TOUR)
 
 # tutorial-board: schematics only, no board file. The docsite ladder never reads copper, and the
 # Jetson board file is 81MB, so shipping it here would multiply every tutorial CI run by twenty.
