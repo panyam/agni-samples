@@ -187,17 +187,20 @@ and 12 layers.
 | | |
 |---|---|
 | Upstream | BeagleBone AI, by BeagleBoard.org |
-| Source | [beagleboard/beaglebone-ai](https://github.com/beagleboard/beaglebone-ai), `HW/BeagleBone-AI.brd` and `HW/cds2f_BeagleBone-AI.txt`, commit `819b6268` |
+| Source | [beagleboard/beaglebone-ai](https://github.com/beagleboard/beaglebone-ai), `HW/BeagleBone-AI.brd`, `HW/cds2f_BeagleBone-AI.txt`, and the twelve copper films and `photoplot.log` in `MFG/`, commit `819b6268` |
 | Licence | CC-BY-4.0 (`allegro/beaglebone-ai/LICENSE`, the repo's own) |
 | Copyright | (c) 2019 Jason Kridner, Texas Instruments; (c) 2019 Embest Technology Co., Ltd.; (c) 2020 Seeed Technology Co., Ltd |
 | Taken | 2026-11-05 |
-| Modifications | **None.**  Both files are byte-identical to upstream. |
-| Not included | the OrCAD schematic (`.dsn`), the RevA2 board, Gerbers, BOMs and PDFs |
+| Modifications | **None.**  Every file is byte-identical to upstream. |
+| Not included | the OrCAD schematic (`.dsn`), the RevA2 board, the mask, paste, silk, assembly and drill films, BOMs and PDFs |
 
 An Allegro 17.2 board, with 716 components and 12 copper layers. Allegro wrote
 `cds2f_BeagleBone-AI.txt` from this board, as the extract's `J!` header row records. It lists each
 component's placement, and each pin's net, name and position. It also lists the vias with their nets,
 and the padstacks on each layer. agni's Allegro reader is held to it.
+
+`MFG/` holds the copper films Allegro 17.2-S049 plotted from this board, one per layer, as
+`photoplot.log` records. agni holds each copper layer it reads to its film (panyam/agni#1376).
 
 ### The other Allegro boards
 
