@@ -1,7 +1,9 @@
 # Added by agni, not part of the upstream design (see PROVENANCE.md). Analysis reads the EDIF netlist
-# that OrCAD Capture wrote. CLAYR6.brd beside it is the same revision's Allegro board, saved by
-# Allegro 16.6. agni reads only 17.2 boards so far (panyam/agni#1355), and it fails a read when it
-# can't open a companion, so the board isn't declared as one until 16.6 reads.
+# that OrCAD Capture wrote. CLAYR6.brd beside it is the Allegro 16.6 board, and pstxnet.dat is the
+# netlist Capture handed Allegro for that board. The EDIF holds only the top page and is a month
+# older than the board, so its designators name different parts. J7 is a two-pin part in the EDIF
+# and the JTAG header on the board. So the board isn't declared as the EDIF's companion, because a
+# cross-probe between them would pair the wrong parts.
 name: clay-r6
 title: Clay R6
 entry: CLAYR6.EDF

@@ -1,6 +1,7 @@
 # Added by agni, not part of the upstream design (see PROVENANCE.md). Analysis reads the IPC-2581
-# file that Allegro wrote. parasdr_odb++.xml holds the same board as ODB++X, and agni can't read that
-# yet. So it isn't declared as a companion, since agni fails a read when it can't open a companion.
+# file that Allegro wrote. parasdr_odb++.xml holds the same board as ODB++X, and parasdr_layout.brd
+# is the Allegro 16.6 board Allegro exported both from. agni's tests hold each of the three to the
+# others, so the descriptor names only the entry.
 name: parallella-parasdr
 title: Parallella parasdr
 entry: parasdr_ipc2581.xml

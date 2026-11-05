@@ -26,17 +26,17 @@ boards (CC-BY-4.0).  Allegro's tools wrote three more boards (CERN-OHL-S, CC-BY-
 kicad-cli exported each KiCad board above.
 
 `cadence/` holds Cadence's other exports, and each has a `design.yaml`.  Allegro wrote the Parallella
-parasdr to IPC-2581 (CC BY-SA 3.0 US), and OrCAD Capture wrote Clay R6 to EDIF (MIT).  Clay R6's
-Allegro board sits beside its EDIF, saved by Allegro 16.6, and its `design.yaml` names it once agni
-reads that version.
+parasdr to IPC-2581 and ODB++X (CC BY-SA 3.0 US), and its Allegro 16.6 board sits beside them.
+OrCAD Capture wrote Clay R6 to EDIF (MIT).  Clay R6's Allegro 16.6 board sits beside it with
+`pstxnet.dat`, the netlist Capture handed Allegro for that board.
 
 `allegro/` holds Allegro boards, each as its publisher released it.  Four come from BeagleBoard.org
 (CC-BY-4.0).  The BeagleBone AI comes with an extract that Allegro wrote from it.  BeaglePlay,
 BeagleV-Fire and BeagleBone AI-64 come with other files Allegro wrote beside each board, such as
 Gerbers and drill files, or a placement report.  BeagleBoard's Allegro boards use three `.brd`
-header families, and these four cover all three.  The other three `.brd` boards are pc069, the
-OpenCellular breakout and the Parallella parasdr.  Each publisher also released an export of the
-same board, and those exports sit under `odb/allegro/` or `cadence/`.
+header families, and these four cover all three.  The other two `.brd` boards are pc069 and the
+OpenCellular breakout.  Each publisher also released an ODB++ job of the same board, under
+`odb/allegro/`.
 
 ## Opening them in agni
 
