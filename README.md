@@ -107,6 +107,7 @@ Tarballs are built per purpose, so a job downloads only what it needs:
 | `tutorial-board` | the Jetson baseboard, schematics only |
 | `oracle-corpus` | every board, schematics and board files |
 | `odb-altium` | ODB++ jobs Altium Designer wrote (the foxBMS boards), byte-identical to their publisher's |
+| `altium` | the same foxBMS boards as Altium saved them (`.PcbDoc`), each held to its ODB++ export in `odb-altium` |
 | `odb-kicad` | each board above exported to ODB++ by kicad-cli, for reading a board both ways |
 | `allegro` | the BeagleBone AI's Allegro `.brd`, with the extract Allegro wrote from the same board |
 | `cadence-exports` | ODB++ jobs Allegro's tools wrote (`odb/allegro/`), and the IPC-2581 and EDIF exports under `cadence/` |

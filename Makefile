@@ -225,6 +225,12 @@ $(DIST)/allegro-boards-$(VERSION).tar.gz:
 
 # cadence-exports: designs that Cadence's tools exported in formats agni reads today, byte-identical
 # to their publishers'. The ODB++ jobs from Allegro sit under odb/allegro/, beside odb/altium/. The
+# altium: the foxBMS boards as Altium Designer saved them (.PcbDoc), byte-identical to their
+# publisher's. Each board's ODB++ export is in odb-altium, so agni's .PcbDoc reader is held to it.
+$(DIST)/altium-$(VERSION).tar.gz:
+	@mkdir -p $(DIST)
+	find altium -type f ! -name '._*' | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
+
 # IPC-2581 and EDIF exports sit under cadence/, each with a design.yaml.
 $(DIST)/cadence-exports-$(VERSION).tar.gz:
 	@mkdir -p $(DIST)
@@ -233,7 +239,7 @@ $(DIST)/cadence-exports-$(VERSION).tar.gz:
 dist: $(DIST)/tutorial-board-$(VERSION).tar.gz $(DIST)/oracle-corpus-$(VERSION).tar.gz \
       $(DIST)/odb-altium-$(VERSION).tar.gz $(DIST)/odb-kicad-$(VERSION).tar.gz \
       $(DIST)/allegro-$(VERSION).tar.gz $(DIST)/allegro-boards-$(VERSION).tar.gz \
-      $(DIST)/cadence-exports-$(VERSION).tar.gz
+      $(DIST)/cadence-exports-$(VERSION).tar.gz $(DIST)/altium-$(VERSION).tar.gz
 	@cd $(DIST) && shasum -a 256 *-$(VERSION).tar.gz > SHA256SUMS
 	@echo
 	@echo "built $(VERSION):"
