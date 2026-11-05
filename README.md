@@ -26,7 +26,9 @@ boards (CC-BY-4.0).  Allegro's tools wrote three more boards (CERN-OHL-S, CC-BY-
 kicad-cli exported each KiCad board above.
 
 `cadence/` holds Cadence's other exports, and each has a `design.yaml`.  Allegro wrote the Parallella
-parasdr to IPC-2581 (CC BY-SA 3.0 US), and OrCAD Capture wrote Clay R6 to EDIF (MIT).
+parasdr to IPC-2581 (CC BY-SA 3.0 US), and OrCAD Capture wrote Clay R6 to EDIF (MIT).  Clay R6's
+Allegro board sits beside its EDIF, saved by Allegro 16.6, and its `design.yaml` names it once agni
+reads that version.
 
 `allegro/` holds Allegro boards, each as its publisher released it.  Four come from BeagleBoard.org
 (CC-BY-4.0).  The BeagleBone AI comes with an extract that Allegro wrote from it.  BeaglePlay,
