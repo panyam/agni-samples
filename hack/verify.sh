@@ -27,12 +27,37 @@ for p in project.yaml boards/project.yaml; do
   [ -e "$p" ] && bad "$p would become the project of every board, and no board extends it"
 done
 
+# A team's house boards stay out of this public repo. Only the README and the template are tracked
+# under house/, and no tracked file may name a mount beyond the three agni.yaml declares, since one
+# naming mount://<team-folder> is a house path on its way to being pushed. Both read git's index, so
+# they also see what is staged, which is what the pre-commit hook needs.
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  while IFS= read -r f; do
+    case $f in
+      house/README.md | house/_template/*) ;;
+      *) bad "$f is tracked, and house/ is for boards that stay on this machine (house/README.md)" ;;
+    esac
+  done < <(git ls-files -- house)
+
+  while IFS= read -r hit; do
+    bad "$hit names a mount other than boards, odb or house"
+  done < <(git ls-files -z | xargs -0 grep -IHnoE 'mount://[A-Za-z0-9][A-Za-z0-9_.-]*' 2>/dev/null \
+             | grep -vE ':mount://(boards|odb|house)$')
+fi
+
 if [ -n "${AGNI:-}" ]; then
+  # house/ is read too, so a team's own boards get the same check. When HOUSE_DIR moves it, every
+  # read names all three mounts, because a --mount replaces agni.yaml's whole table.
+  house=${HOUSE_DIR:-house}
+  mounts=()
+  [ "$house" = house ] || mounts=(--mount boards=boards --mount odb=odb --mount "house=$house")
   designs=$(find boards -name design.yaml ! -path '*/._*' -exec dirname {} \; 2>/dev/null | sort)
+  house_designs=$(find "$house" -name design.yaml ! -path '*/._*' ! -path '*/_template/*' -exec dirname {} \; 2>/dev/null | sort)
   jobs=$(find odb -type f \( -name '*.odb.tgz' -o -name '*.odb.zip' \) ! -name '._*' 2>/dev/null | sort)
-  for path in $designs $jobs; do
-    uri=mount://$path
-    if ! out=$("$AGNI" stats "$uri" 2>&1); then
+  uris=$(for p in $designs $jobs; do echo "mount://$p"; done
+         for p in $house_designs; do echo "mount://house/${p#"$house"/}"; done)
+  for uri in $uris; do
+    if ! out=$("$AGNI" stats ${mounts[@]+"${mounts[@]}"} "$uri" 2>&1); then
       bad "$uri does not read: $(why "$out")"
       continue
     fi
@@ -41,7 +66,7 @@ if [ -n "${AGNI:-}" ]; then
       bad "$uri reads as zero components; $("$AGNI" version | head -1) may be too old for it"
       continue
     fi
-    if ! out=$("$AGNI" check "$uri" 2>&1 >/dev/null); then
+    if ! out=$("$AGNI" check ${mounts[@]+"${mounts[@]}"} "$uri" 2>&1 >/dev/null); then
       bad "agni check $uri failed: $(why "$out")"
       continue
     fi

@@ -25,12 +25,12 @@ wrote them (CC-BY-4.0), and each KiCad board above as kicad-cli exports it.
 
 ## Opening them in agni
 
-A checkout is something `agni serve` can open as it stands.  `agni.yaml` at the root mounts `boards/`
-and `odb/`, so `agni check mount://boards/hackrf-one` works from anywhere inside it with no flags.
+A checkout is something `agni serve` can open as it stands.  `agni.yaml` at the root mounts `boards/`,
+`odb/` and `house/`, so `agni check mount://boards/hackrf-one` works from anywhere inside it with no flags.
 You need agni v0.4.0 or later, the first release with the ODB++ reader.
 
 ```bash
-make serve        # the viewer over every board and job, at http://127.0.0.1:8080/
+make serve        # the viewer over every board, job and house board, at http://127.0.0.1:8080/
 make serve-wasm   # the same, with each design analysed in your browser
 make site         # the whole set as static files in site/, the way agni's public demo is built
 ```
@@ -45,8 +45,37 @@ In `serve-wasm` a design bigger than serve's `--wasm-max-bytes` (128 MB) goes to
 and the page says so.  Jetson is about 92 MB, so every board here runs in the browser.
 
 `make verify` checks that each board folder has a `design.yaml` and a `PROVENANCE.md` section, and
-that no `project.yaml` sits over the boards.  `make verify AGNI=agni` also reads every board and job
-and fails on one that reads as no components.  `make test` checks those checks.  CI runs both.
+that no `project.yaml` sits over the boards.  `make verify AGNI=agni` also reads every board, job
+and house board, and fails on one that reads as no components.  `make test` checks those checks.  CI runs both.
+
+## Your own boards beside these
+
+A team can clone this repo and run every analysis on its own boards, after seeing each one work on a
+public board first.  `make tour` runs every target below on Glasgow.
+
+Your boards go in a third mount, `house`.  It defaults to `house/` in the checkout, and
+`HOUSE_DIR=<folder>` moves it.  A folder outside the checkout is safer, since this repo is public.
+`house/README.md` walks through adding a board from the template, with a `project.yaml` for your
+team's conventions, checklists and query sets.  `make setup` installs a pre-commit hook that refuses
+a commit with a house board in it.
+
+Each target runs one agni command over `DESIGN=mount://...`, which defaults to Glasgow:
+
+| target | runs |
+|---|---|
+| `make check` | every rule, as text, and the verdict report in `reports/<name>-check.html` |
+| `make review CHECKLIST=...` | a checklist walk, and its report in `reports/`.  Defaults to `examples/checklist.yaml` |
+| `make diff A=... B=...` | the structural diff of two revisions or two views.  `RENAME_APPROX=1` pairs renamed nets that also changed |
+| `make query SET=...` | a query set.  Defaults to `examples/queries.yaml` |
+| `make trace FROM=U1.51 TO=U14.3` | the series path between two pins |
+| `make lexicon` | the vocabulary agni reads the design's names with |
+| `make pinmap` | a row per pin the design's `io_map` declares, in `reports/<name>-pins.csv` |
+| `make intake` | the sanitized summary, with no net name in it |
+| `make trial` | the `agni trial` report, with no name from the design in it |
+
+`reports/` is gitignored.  Everything in it except the intake and trial reports carries your net names
+and reference designators.  These variables come from the make command line only, so a `DESIGN`
+exported for another project's Makefile doesn't reach these targets.
 
 ## Using these from the engine
 

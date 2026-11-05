@@ -1,0 +1,44 @@
+# Your team's project: the config every house board shares. Copy this file to project.yaml at the top
+# of your house folder (house/project.yaml, or $HOUSE_DIR/project.yaml), and give each board a
+# design.yaml that names it with `extends: ../project.yaml`.
+#
+# Every section is optional. The shapes are in agni's guide, "Projects and designs":
+# https://github.com/panyam/agni/blob/main/docsite/content/guide/projects.md
+name: house
+title: Our boards
+
+# Folders of the project's own files, each relative to this file. Create the ones you use.
+#   profiles: interface profiles (YAML), e.g. your own PCIe or CAN expectations
+#   params:   datasheet facts (PartSpec textprotos) for the parts you buy
+#   lib:      derived relations (.dl) your queries and checklist items can call
+#   queries:  query sets, which `make query SET=<name>` and the viewer's Sets menu open
+# profiles: [profiles]
+# params: [params]
+# lib: [lib]
+# queries: [queries]
+
+# Your naming conventions. The lexicon teaches agni which of your net names are rails, and the rules
+# check names against your house style. `make lexicon DESIGN=...` shows what agni reads today.
+# conventions:
+#   name: house
+#   lexicon:
+#     net:
+#       rail:
+#         patterns: ["_[0-9]+V[0-9]*$"]
+
+# Checklists, picked by name with `make review CHECKLIST=<name>`. The first one is the default.
+checklists:
+  review:
+    name: House design review
+    areas:
+      - name: Power
+        items:
+          - {id: P1, title: every rail carries decoupling, rule: decoupling-present}
+          - {id: P2, title: the input is protected against reverse polarity, rule: reverse-blocking-absent}
+      - name: Interfaces
+        items:
+          - {id: I1, title: every I2C bus has pull-ups, rule: i2c-pull-up}
+          - {id: I2, title: exposed signals have ESD protection, rule: esd-protection}
+      - name: Sign-off
+        items:
+          - {id: S1, title: the schematic matches the block diagram, note: reviewed by hand}

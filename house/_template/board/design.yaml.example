@@ -1,0 +1,20 @@
+# One house board. Copy this folder next to project.yaml, rename it for the board, put the board's
+# files in it, and rename this file to design.yaml. `agni propose <folder>` drafts the entry and
+# companions from the files it finds.
+name: my-board
+title: My board
+extends: ../project.yaml
+
+# The file analysis reads, normally the schematic or the netlist.
+entry: my-board.kicad_sch
+
+# Other views of the same board: the copper, an export. agni draws and checks against them, and
+# never reads one as a second source of parts.
+companions:
+  - my-board.kicad_pcb
+
+# Optional: what you intend, for the rules that check against it. A connector declared internal is
+# not treated as a way into the product. `io_map` declares the pin map that `make pinmap` signs off.
+# intent:
+#   components:
+#     J1: {exposure: internal}

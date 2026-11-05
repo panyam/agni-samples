@@ -18,8 +18,16 @@ clean_tree() {
   mkdir -p "$t/boards/alpha" "$t/odb"
   printf 'name: alpha\nentry: alpha.kicad_sch\n' > "$t/boards/alpha/design.yaml"
   printf '# Provenance\n\n## alpha\n\nfrom somewhere\n' > "$t/PROVENANCE.md"
-  printf 'mounts:\n  boards: boards\n  odb: odb\n' > "$t/agni.yaml"
+  printf 'mounts:\n  boards: boards\n  odb: odb\n  house: house\n' > "$t/agni.yaml"
+  mkdir -p "$t/house/_template"
+  printf 'house\n' > "$t/house/README.md"
+  printf 'name: house\n' > "$t/house/_template/project.yaml.example"
+  git -C "$t" init -q && git -C "$t" add -A
 }
+
+# Spelled in two halves, so this file names no foreign mount itself and passes the check it tests.
+foreign="mount:""//acme"
+
 
 expect() {
   local want=$1 name=$2 tree=$3 out
@@ -52,6 +60,25 @@ expect fail "a project.yaml at the root" "$t"
 t=$work/boards-project; clean_tree "$t"; : > "$t/boards/project.yaml"
 expect fail "a project.yaml under boards/" "$t"
 
+t=$work/house-board; clean_tree "$t"; mkdir -p "$t/house/widget"
+printf 'name: widget\n' > "$t/house/widget/design.yaml"; git -C "$t" add -f house/widget/design.yaml
+expect fail "a tracked file under house/" "$t"
+
+t=$work/house-untracked; clean_tree "$t"; mkdir -p "$t/house/widget"
+printf 'name: widget\n' > "$t/house/widget/design.yaml"
+expect pass "an untracked house board" "$t"
+
+t=$work/foreign-mount; clean_tree "$t"; printf 'see %s/widget\n' "$foreign" > "$t/notes.md"; git -C "$t" add notes.md
+expect fail "a tracked file naming a mount other than boards, odb or house" "$t"
+
+t=$work/known-mounts; clean_tree "$t"
+printf 'mount://boards/alpha mount://odb/x mount://house/y\n' > "$t/notes.md"; git -C "$t" add notes.md
+expect pass "a tracked file naming the three known mounts" "$t"
+
+t=$work/placeholder-mount; clean_tree "$t"
+printf 'DESIGN=mount://... or mount://<board>\n' > "$t/notes.md"; git -C "$t" add notes.md
+expect pass "a placeholder mount in prose" "$t"
+
 if [ -n "${AGNI:-}" ]; then
   t=$work/real; clean_tree "$t"; rm -r "$t/boards/alpha"
   cp -R "$repo/boards/glasgow-revC3" "$t/boards/"
@@ -62,6 +89,21 @@ if [ -n "${AGNI:-}" ]; then
   printf '(kicad_sch (version 20231120) (generator "eeschema") (uuid "00000000-0000-0000-0000-000000000000") (paper "A4"))\n' \
     > "$t/boards/alpha/alpha.kicad_sch"
   expect fail "a design that reads as zero components" "$t" "$AGNI"
+
+  t=$work/house-read; clean_tree "$t"; rm -r "$t/boards/alpha"; cp -R "$repo/boards/glasgow-revC3" "$t/house/acme-io"
+  expect pass "a house board reads" "$t" "$AGNI"
+
+  t=$work/house-empty; clean_tree "$t"; rm -r "$t/boards/alpha"; mkdir -p "$t/house/widget"
+  printf 'name: widget\nentry: widget.kicad_sch\n' > "$t/house/widget/design.yaml"
+  printf '(kicad_sch (version 20231120) (generator "eeschema") (uuid "00000000-0000-0000-0000-000000000000") (paper "A4"))\n' \
+    > "$t/house/widget/widget.kicad_sch"
+  expect fail "a house board that reads as zero components" "$t" "$AGNI"
+
+  t=$work/house-elsewhere; clean_tree "$t"; rm -r "$t/boards/alpha"; mkdir -p "$work/elsewhere/widget"
+  printf 'name: widget\nentry: widget.kicad_sch\n' > "$work/elsewhere/widget/design.yaml"
+  printf '(kicad_sch (version 20231120) (generator "eeschema") (uuid "00000000-0000-0000-0000-000000000000") (paper "A4"))\n' \
+    > "$work/elsewhere/widget/widget.kicad_sch"
+  HOUSE_DIR=$work/elsewhere expect fail "a house board in HOUSE_DIR that reads as zero components" "$t" "$AGNI"
 
   t=$work/bad-odb; clean_tree "$t"; rm -r "$t/boards/alpha"; : > "$t/PROVENANCE.md"
   mkdir -p "$t/odb/kicad"; printf 'not a tarball' > "$t/odb/kicad/broken.odb.tgz"

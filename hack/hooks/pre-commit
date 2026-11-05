@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Installed by `make setup`. Runs make verify's checks on what is staged, so a house board or a path
+# into a team's own folder is caught before it is committed, not after it is pushed.
+exec "$(git rev-parse --show-toplevel)/hack/verify.sh"
