@@ -362,11 +362,11 @@ parts than the board's do. J7 is a two-pin part in the EDIF and the JTAG header 
 
 `pstxnet.dat` (added in v0.1.11, SHA-256 `1f7f1612...61461`) is the second view. Capture's netlister
 wrote it on 2016-03-06, and upstream committed it with the board in `6ab7c5d2`. It is the expanded
-netlist Allegro imports, one `NODE_NAME <ref> <pin>` line per pin under each `NET_NAME`. 558 of its
-571 pins sit on the same net on the board. Seven are no-connect pins, which Capture gathers on a net
-named `NC`. Six are on C2, TP24 and TP25, which the board does not place yet, and the six pins left
-are R9's and U5's buzzer pins, which the netlist moved after the board was saved. agni's tests hold
-the board read to it (panyam/agni#1388).
+netlist Allegro imports, one `NODE_NAME <ref> <pin>` line per pin under each `NET_NAME`. 552 of its
+571 pins sit on the same net on the board. Seven of the other 19 are no-connect pins, which Capture
+gathers on a net named `NC`. Eight are on C2, TP24 and TP25, which the board does not place yet, and
+on the two WiFi nets they join. Four are R9's and U5's buzzer pins, which the netlist moved after the
+board was saved. agni's tests hold the board read to it (panyam/agni#1388).
 
 ## Reciprocal licences
 
