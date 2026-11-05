@@ -203,13 +203,23 @@ $(DIST)/odb-kicad-$(VERSION).tar.gz:
 
 # allegro: Allegro board files, byte-identical to their publishers', each beside an extract Allegro
 # wrote from the same board. agni's Allegro reader is held to the extract, so the two ship together.
+ALLEGRO_EXTRACT_BOARDS := allegro/beaglebone-ai
 $(DIST)/allegro-$(VERSION).tar.gz:
 	@mkdir -p $(DIST)
-	find allegro -type f ! -name '._*' | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
+	find $(ALLEGRO_EXTRACT_BOARDS) -type f ! -name '._*' | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
+
+# allegro-boards: the other Allegro boards, one per .brd header family, with the files Allegro wrote
+# beside them (Gerbers and drill, a placement report, the OrCAD schematic). No publisher released an
+# extract for these, so a read of the .brd is checked against those instead. About 90MB, so it ships
+# apart from allegro and a job that only needs the extract-backed board fetches less.
+$(DIST)/allegro-boards-$(VERSION).tar.gz:
+	@mkdir -p $(DIST)
+	find allegro -type f ! -name '._*' $(foreach b,$(ALLEGRO_EXTRACT_BOARDS),! -path '$(b)/*') \
+	  | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
 
 dist: $(DIST)/tutorial-board-$(VERSION).tar.gz $(DIST)/oracle-corpus-$(VERSION).tar.gz \
       $(DIST)/odb-altium-$(VERSION).tar.gz $(DIST)/odb-kicad-$(VERSION).tar.gz \
-      $(DIST)/allegro-$(VERSION).tar.gz
+      $(DIST)/allegro-$(VERSION).tar.gz $(DIST)/allegro-boards-$(VERSION).tar.gz
 	@cd $(DIST) && shasum -a 256 *-$(VERSION).tar.gz > SHA256SUMS
 	@echo
 	@echo "built $(VERSION):"

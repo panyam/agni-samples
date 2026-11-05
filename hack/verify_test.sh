@@ -60,6 +60,21 @@ expect fail "a project.yaml at the root" "$t"
 t=$work/boards-project; clean_tree "$t"; : > "$t/boards/project.yaml"
 expect fail "a project.yaml under boards/" "$t"
 
+allegro_tree() {
+  clean_tree "$1"; mkdir -p "$1/allegro/widget"
+  : > "$1/allegro/widget/widget.brd"; printf 'CC-BY-4.0\n' > "$1/allegro/widget/LICENSE"
+  printf '\n### Widget (`allegro/widget/`)\n' >> "$1/PROVENANCE.md"
+}
+
+t=$work/allegro-clean; allegro_tree "$t"
+expect pass "an Allegro board with a licence and a section" "$t"
+
+t=$work/allegro-no-licence; allegro_tree "$t"; rm "$t/allegro/widget/LICENSE"
+expect fail "an Allegro board with no LICENSE" "$t"
+
+t=$work/allegro-no-provenance; allegro_tree "$t"; printf '# Provenance\n\n## alpha\n' > "$t/PROVENANCE.md"
+expect fail "an Allegro board with no PROVENANCE.md section" "$t"
+
 t=$work/house-board; clean_tree "$t"; mkdir -p "$t/house/widget"
 printf 'name: widget\n' > "$t/house/widget/design.yaml"; git -C "$t" add -f house/widget/design.yaml
 expect fail "a tracked file under house/" "$t"

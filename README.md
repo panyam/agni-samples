@@ -23,8 +23,10 @@ They live in their own repo so that the engine repo stays a single licence and t
 ODB++ jobs sit apart, under `odb/` (see `PROVENANCE.md`): foxBMS's five boards as Altium Designer
 wrote them (CC-BY-4.0), and each KiCad board above as kicad-cli exports it.
 
-Allegro boards sit under `allegro/`: the BeagleBone AI board as BeagleBoard.org published it
-(CC-BY-4.0), beside the extract Allegro wrote from it.
+Allegro boards sit under `allegro/`, each as BeagleBoard.org published it (CC-BY-4.0).  The
+BeagleBone AI comes with an extract Allegro wrote from it.  BeaglePlay, BeagleV-Fire and BeagleBone
+AI-64 come with the other files Allegro wrote beside each board: Gerbers and drill files, or a
+placement report.  Their `.brd` files span the three header families BeagleBoard's boards use.
 
 ## Opening them in agni
 
@@ -93,7 +95,8 @@ Tarballs are built per purpose, so a job downloads only what it needs:
 | `oracle-corpus` | every board, schematics and board files |
 | `odb-altium` | ODB++ jobs Altium Designer wrote (the foxBMS boards), byte-identical to their publisher's |
 | `odb-kicad` | each board above exported to ODB++ by kicad-cli, for reading a board both ways |
-| `allegro` | Allegro `.brd` boards, each with an extract Allegro wrote from the same board |
+| `allegro` | the BeagleBone AI's Allegro `.brd`, with the extract Allegro wrote from the same board |
+| `allegro-boards` | three more Allegro `.brd` boards, with the Gerbers, drill files, placement report and OrCAD schematics Allegro and OrCAD wrote beside them |
 
 `make dist` builds them all and writes `SHA256SUMS`.  `make list` prints the lines to pin.  `make
 verify-dist` checks a built set against its sums.

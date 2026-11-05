@@ -148,6 +148,70 @@ extract written from this board, as its `J!` header row records. It lists each c
 each pin's net, name and position, the vias and their nets, and the padstacks per layer, so agni's
 Allegro reader is held to it.
 
+### The other Allegro boards
+
+No publisher released an extract for these three, so they ship in `allegro-boards` with the files
+Allegro wrote beside each board. A `.brd` read can be checked against those: copper and holes
+against the Gerbers and drill files, and part positions against a placement report.
+
+Each `.brd` opens with a 4-byte header word. BeagleBoard's Allegro boards use three of them, and
+these three boards are one of each. The BeagleBone AI above and the AI-64 share `00 04 14 00`, the
+header of a board the section above records as Allegro 17.2. BeaglePlay has `02 09 14 00`, which BeagleV-Ahead and PocketBeagle
+2 share. BeagleV-Fire has `02 15 14 00`, which BeagleY-AI shares. The `.brd` files carry no readable
+version string. The Gerbers name their writer: Allegro 17.4-S032 for BeaglePlay and 17.4-S031 for
+BeagleV-Fire, so both later headers come from 17.4 builds.
+
+Files keep their upstream paths under each board's folder. Allegro's numbered backups
+(`art_param.txt,1`, `nc_param.txt,1`) are left out as editor state.
+
+### BeaglePlay (`allegro/beagleplay/`)
+
+| | |
+|---|---|
+| Upstream | BeaglePlay, by BeagleBoard.org |
+| Source | [beagleboard/beagleplay](https://github.com/beagleboard/beagleplay), commit `7a59a98a` |
+| Licence | CC-BY-4.0 (`allegro/beagleplay/LICENSE`, the repo's own) |
+| Copyright | (c) 2023 Seeed Technology Co., Ltd; (c) 2023 BeagleBoard.org Foundation |
+| Taken | 2026-11-05 |
+| Files | `Design/20230215_beagleplayv022_10.brd`, the OrCAD schematic `Design/BEAGLEPLAYV10_221227.DSN`, the Gerbers, drill and route files in `MFG/gerber_beagleplayv022_230215/`, and `BeaglePlay_bom.csv` |
+| Modifications | **None.**  Every file is byte-identical to upstream, checked against its git blob hash. |
+| Not included | PDFs, the placement spreadsheet, certification reports, and the two `,1` backups |
+
+`.brd` header `02 09 14 00`. 8 copper layers (`L1_top` to `L8_bottom`). The Gerbers record
+"Cadence Allegro 17.4-S032", written 2023-02-15.
+
+### BeagleV-Fire (`allegro/beaglev-fire/`)
+
+| | |
+|---|---|
+| Upstream | BeagleV-Fire, by BeagleBoard.org |
+| Source | [beagleboard/beaglev-fire](https://github.com/beagleboard/beaglev-fire), commit `cdbd4b68` |
+| Licence | CC-BY-4.0 (`allegro/beaglev-fire/LICENSE`, the repo's own) |
+| Copyright | (c) 2023 Seeed Technology Co., Ltd; (c) 2023 BeagleBoard.org Foundation |
+| Taken | 2026-11-05 |
+| Files | `design/BeagleV-FIRE_REV-A_230911.brd`, the OrCAD schematic `design/BeagleV-FIRE_REV-A_230911.DSN`, the Gerbers, drill and route files in `design/gerbers/`, and `design/BeagleV-Fire_BOM.csv` |
+| Modifications | **None.**  Every file is byte-identical to upstream, checked against its git blob hash. |
+| Not included | PDFs, 3D models, and the two `,1` backups |
+
+`.brd` header `02 15 14 00`. 12 copper layers (`TOP`, `LAY2_GND` to `LAY11_GND`, `BOTTOM`). The Gerbers
+record "Cadence Allegro 17.4-S031", written 2023-09-26.
+
+### BeagleBone AI-64 (`allegro/beaglebone-ai-64/`)
+
+| | |
+|---|---|
+| Upstream | BeagleBone AI-64, Rev B1, by BeagleBoard.org |
+| Source | [beagleboard/beaglebone-ai-64](https://github.com/beagleboard/beaglebone-ai-64), commit `7313ca3c` |
+| Licence | CC-BY-4.0 (`allegro/beaglebone-ai-64/LICENSE`, the repo's own) |
+| Copyright | (c) 2021-2022 BeagleBoard.org Foundation; (c) 2021-2022 Seeed Technology Co., Ltd |
+| Taken | 2026-11-05 |
+| Files | `hw/BeagleBone_AI-64_Rev_B1_PCB_220602.brd`, the placement report `hw/BeagleBone_AI-64_Rev_B1_ASSY_XY_220602.csv`, and `hw/BeagleBone_AI-64_Rev_B1_BOM_220602.csv` |
+| Modifications | **None.**  Every file is byte-identical to upstream, checked against its git blob hash. |
+| Not included | the OrCAD schematic (`.DSN`, 30MB), the PDF schematic and the TI documentation |
+
+`.brd` header `00 04 14 00`. The placement report is Allegro's Component Report: 1166 components, each
+with its device, package, position, rotation and side.
+
 ## Reciprocal licences
 
 A strongly reciprocal licence (CERN-OHL-S, GPL) obliges whoever distributes a MODIFIED design or a
