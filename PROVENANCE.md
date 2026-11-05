@@ -263,6 +263,44 @@ record "Cadence Allegro 17.4-S031", written 2023-09-26.
 `.brd` header `00 04 14 00`. The placement report is Allegro's Component Report: 1166 components, each
 with its device, package, position, rotation and side.
 
+### Allegro boards with their own export
+
+Each of these boards' publishers also released an export of the same board, which sits in the
+`cadence-exports` tarball. A `.brd` read can be held to it, pin by pin and net by net. Each file is
+byte-identical to upstream, checked against git's blob hash, and each `LICENSE` is the same repo's
+licence as beside its export. Their header words add three more families to the three above.
+
+### pc069 rev c board (`allegro/pc069/`)
+
+| | |
+|---|---|
+| Source | [uob-hep-cad/uob-hep-pc069](https://github.com/uob-hep-cad/uob-hep-pc069), `hardware/Cadence/worklib/pc069c_toplevel/physical/pc069c_toplevel_25.brd`, commit `d86f9c06` |
+| Licence | CERN-OHL-S-2.0 |
+| Paired with | `odb/allegro/pc069/pc069c_toplevel_25.odb.tgz`, the ODB++ job of the same revision, 25 |
+| Not included | revisions 19 to 24, the `EDA-02319` and `alinx_acau15_carrier` boards beside it |
+
+`.brd` header `00 02 15 00`. Its job was written by Allegro 2409.
+
+### OpenCellular breakout board (`allegro/opencellular-breakout/`)
+
+| | |
+|---|---|
+| Source | [Telecominfraproject/OpenCellular](https://github.com/Telecominfraproject/OpenCellular), `electronics/breakout/board/OC_CONNECT-1_BREAKOUT_LIFE-3.brd`, commit `0d5d7b00` |
+| Licence | CC-BY-4.0 |
+| Paired with | `odb/allegro/opencellular-breakout/opencellular-breakout.odb.tgz` |
+
+`.brd` header `04 15 13 00`.
+
+### Parallella parasdr board (`allegro/parallella-parasdr/`)
+
+| | |
+|---|---|
+| Source | [parallella/parallella-hw](https://github.com/parallella/parallella-hw), `parasdr/src/parasdr_layout.brd`, commit `a6bcdf84` |
+| Licence | CC BY-SA 3.0 US |
+| Paired with | `cadence/parallella-parasdr/parasdr_ipc2581.xml`, and the ODB++X beside it |
+
+`.brd` header `03 15 13 00`. Its ODB++X names Allegro SPB 16.6.
+
 ## Cadence exports (`cadence/`)
 
 Designs as Cadence's tools exported them, in formats agni reads today. Each has a `design.yaml`

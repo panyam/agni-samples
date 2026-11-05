@@ -31,6 +31,8 @@ Allegro boards sit under `allegro/`, each as BeagleBoard.org published it (CC-BY
 BeagleBone AI comes with an extract Allegro wrote from it.  BeaglePlay, BeagleV-Fire and BeagleBone
 AI-64 come with the other files Allegro wrote beside each board: Gerbers and drill files, or a
 placement report.  Their `.brd` files span the three header families BeagleBoard's boards use.
+Three more `.brd` boards, pc069, the OpenCellular breakout and the Parallella parasdr, each come with
+an export their publisher released of the same board, under `odb/allegro/` or `cadence/`.
 
 ## Opening them in agni
 
@@ -103,7 +105,7 @@ Tarballs are built per purpose, so a job downloads only what it needs:
 | `odb-kicad` | each board above exported to ODB++ by kicad-cli, for reading a board both ways |
 | `allegro` | the BeagleBone AI's Allegro `.brd`, with the extract Allegro wrote from the same board |
 | `cadence-exports` | ODB++ jobs Allegro's tools wrote (`odb/allegro/`), and the IPC-2581 and EDIF exports under `cadence/` |
-| `allegro-boards` | three more Allegro `.brd` boards, with the Gerbers, drill files, placement report and OrCAD schematics Allegro and OrCAD wrote beside them |
+| `allegro-boards` | six more Allegro `.brd` boards: three with the Gerbers, drill files, placement report and OrCAD schematics Allegro and OrCAD wrote beside them, and three whose export is in `cadence-exports` |
 
 `make dist` builds them all and writes `SHA256SUMS`.  `make list` prints the lines to pin.  `make
 verify-dist` checks a built set against its sums.
