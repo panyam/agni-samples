@@ -1,29 +1,30 @@
-# Build the release tarballs the agni engine fetches.
+# Builds the release tarballs the agni engine fetches. It also serves the checkout, checks it, and
+# runs agni's analyses over a design (see the README).
 #
-# The engine pins each tarball by VERSION and sha256, so what matters here is that a published
-# artifact never changes, not that a rebuild is bit-identical. Best-effort determinism anyway
-# (sorted member order, zeroed ownership, no gzip timestamp), so anyone can check a release against
+# The engine pins each tarball by VERSION and sha256. A published artifact must never change, but a
+# rebuild needn't be bit-identical. The build is deterministic where it's cheap (sorted member
+# order, zeroed ownership, no gzip timestamp), so anyone can check a release's contents against
 # this tree.
 #
-# One tarball per PURPOSE, not one big archive. A job downloads what it needs: the tutorial ladder
-# wants schematics for one board, the reader cross-check wants board files for all of them, and
-# making that the same 100MB download would be a tax on every CI run of the engine.
+# One tarball per PURPOSE, not one big archive, so a job downloads only what it needs. The tutorial
+# ladder wants schematics for one board, and the reader cross-check wants board files for all of
+# them. One 100MB download for both would slow every CI run of the engine.
 
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 DIST    := dist
 
-# macOS tar writes a "._name" AppleDouble shadow beside every file it packs unless this is set, and
-# a Finder copy can leave the same shadows on disk, where the find below would match them by
-# extension. Both are excluded, because a consumer globbing *.kicad_sch reads a shadow as a
-# schematic and fails to parse it (agni issue 812).
+# Unless this is set, macOS tar writes a "._name" AppleDouble shadow beside every file it packs. A
+# Finder copy can leave the same shadows on disk, and the finds below would match them by extension.
+# Both are excluded. A consumer that globs *.kicad_sch would read a shadow as a schematic and fail to
+# parse it (agni issue 812).
 export COPYFILE_DISABLE := 1
 
-# A failing tar in the middle of a pipe still lets gzip write a valid empty archive, so without
-# pipefail a tar that rejects a flag produces a tarball that verifies and holds nothing.
+# If tar fails in the middle of a pipe, gzip still writes a valid empty archive. So without pipefail,
+# a tar that rejects a flag produces a tarball that verifies and holds nothing.
 SHELL       := bash
 .SHELLFLAGS := -o pipefail -ec
 
-# Zeroed ownership, spelled for whichever tar is installed: bsdtar (macOS) and GNU tar (Linux) name
+# Zeroed ownership, spelled for whichever tar is installed. bsdtar (macOS) and GNU tar (Linux) name
 # the same flags differently.
 TAR_IDS := $(shell tar --version 2>/dev/null | grep -q 'GNU tar' \
              && echo "--owner=0 --group=0 --numeric-owner" \
@@ -37,8 +38,8 @@ all: dist
 # Serving the checkout. AGNI is the agni binary. A release binary carries the viewer. A dev build
 # (`make agni` in an agni checkout) carries none, so name its web/ too:
 #   make serve AGNI=../agni/bin/agni WEB_DIR=../agni/web
-# MCP=1 also serves agni's analysis to an agent at /mcp. HOUSE_DIR moves the house mount, a team's
-# own boards (house/README.md), to a folder outside the checkout.
+# MCP=1 also serves agni's analysis to an agent at /mcp. The house mount holds a team's own boards
+# (house/README.md), and HOUSE_DIR moves it to a folder outside the checkout.
 #
 # Every target names all four mounts, because a --mount replaces agni.yaml's whole table.
 AGNI      ?= agni
@@ -53,8 +54,8 @@ SERVE     = $(AGNI) serve $(MOUNTS) --addr 127.0.0.1:$(PORT) $(WEB_FLAG) $(if $(
 serve:
 	$(SERVE)
 
-# The same, with each design analysed in the browser. A design over serve's --wasm-max-bytes goes to
-# the server engine, and the page says so.
+# The same, with each design analysed in the browser. If a design is bigger than serve's
+# --wasm-max-bytes, it goes to the server engine, and the page says so.
 serve-wasm:
 	$(SERVE) --engine wasm
 
@@ -65,9 +66,10 @@ site:
 	$(AGNI) site $(SITE_DIR) $(WEB_FLAG) \
 	  $(foreach b,$(notdir $(wildcard boards/*)),--seed $(b)=boards/$(b)) --seed odb=odb --seed cadence=cadence
 
-# Each board folder has a design.yaml and a PROVENANCE.md section, and no project.yaml sits over
-# them. Name an agni to read every design too: make verify AGNI=agni. Without one the reads are
-# skipped, since the default AGNI need not exist. `make test` checks verify itself the same way.
+# Checks each folder's descriptor, licence and PROVENANCE.md section. hack/verify.sh says which
+# folders need which. Name an agni to read every design too: make verify AGNI=agni. Without
+# one the reads are skipped, since the default AGNI need not exist. `make test` checks verify itself
+# the same way.
 READ_AGNI = $(if $(filter command% environment%,$(origin AGNI)),$(AGNI))
 
 verify:
@@ -82,14 +84,14 @@ setup:
 
 # Analysis. Each target runs one agni command over DESIGN, a public board or a house one:
 #   make check DESIGN=mount://house/my-board
-# Reports go to reports/, which git ignores. They carry every net name and reference designator, so
-# only the intake and trial reports are meant to leave the machine.
+# Reports go to reports/, and git ignores it. The reports carry every net name and reference
+# designator, so only the intake and trial reports are meant to leave the machine.
 #
-# A target that would need logic beyond one agni command is a missing command or flag in agni, and is
-# filed there rather than scripted here.
+# If a target would need logic beyond one agni command, agni is missing a command or a flag. File
+# that in agni rather than scripting it here.
 #
-# These take a value from the make command line only, never from the environment. A shell that
-# exports DESIGN for another project's Makefile would otherwise aim every target here at that design.
+# These take a value from the make command line only, never from the environment. Otherwise a shell
+# that exports DESIGN for another project's Makefile would aim every target here at that design.
 DESIGN     = mount://boards/glasgow-revC3
 CHECKLIST  = examples/checklist.yaml
 SET        = examples/queries.yaml
@@ -109,12 +111,13 @@ check: | $(REPORTS)
 	$(AGNI) check $(MOUNTS) $(DESIGN)
 	$(AGNI) check $(MOUNTS) $(DESIGN) --format html -o $(REPORTS)/$(NAME)-check.html
 
-# A checklist walk. CHECKLIST is a manifest file, or the name of one the design's project declares.
+# A checklist walk. CHECKLIST is a manifest file, or the name of a checklist in the design's project.
 review: | $(REPORTS)
 	$(AGNI) review $(MOUNTS) $(DESIGN) --checklist $(CHECKLIST)
 	$(AGNI) review $(MOUNTS) $(DESIGN) --checklist $(CHECKLIST) --format html -o $(REPORTS)/$(NAME)-review.html
 
-# Two revisions, or two views of one board. RENAME_APPROX=1 also pairs nets renamed and changed.
+# Two revisions, or two views of one board. RENAME_APPROX=1 also pairs nets that were renamed and
+# changed.
 diff:
 	$(call need,A)
 	$(call need,B)
@@ -130,11 +133,11 @@ trace:
 	$(call need,TO)
 	$(AGNI) trace $(MOUNTS) $(DESIGN) --from $(FROM) --to $(TO)
 
-# The vocabulary agni reads the design's names with, for the verify-lexicon skill.
+# The vocabulary agni uses to read the design's names, for the verify-lexicon skill.
 lexicon:
 	$(AGNI) lexicon $(MOUNTS) $(DESIGN)
 
-# A row per pin the design's io_map declares, to sign off against the netlist and the datasheet.
+# A row for each pin in the design's io_map, to sign off against the netlist and the datasheet.
 pinmap: | $(REPORTS)
 	$(AGNI) check $(MOUNTS) $(DESIGN) --verdicts --format csv --table pin_map -o $(REPORTS)/$(NAME)-pins.csv
 
@@ -149,8 +152,8 @@ trial: | $(REPORTS)
 
 # Every target above on Glasgow, so a team sees each output before adding a board. The trace runs
 # from the microcontroller pin that enables port B's I/O supply, through R26, to the regulator's EN.
-# The diff compares Glasgow's schematic with its kicad-cli ODB++ export. The pin map is the one
-# Glasgow's firmware drives, declared in its design.yaml.
+# The diff compares Glasgow's schematic with its kicad-cli ODB++ export. Glasgow's design.yaml
+# declares the pin map, as Glasgow's firmware drives it.
 TOUR := mount://boards/glasgow-revC3
 tour:
 	@echo "== check";   $(MAKE) -s check   DESIGN=$(TOUR)
@@ -163,8 +166,9 @@ tour:
 	@echo "== trial";   $(MAKE) -s trial   DESIGN=$(TOUR)
 	@echo "== pinmap";  $(MAKE) -s pinmap  DESIGN=$(TOUR)
 
-# tutorial-board: schematics only, no board file. The docsite ladder never reads copper, and the
-# Jetson board file is 81MB, so shipping it here would multiply every tutorial CI run by twenty.
+# tutorial-board: schematics only, no board file. The docsite ladder never reads copper. The Jetson
+# board file is 81MB, and shipping it here would make every tutorial CI run's download twenty times
+# larger.
 $(DIST)/tutorial-board-$(VERSION).tar.gz:
 	@mkdir -p $(DIST)
 	find boards/jetson-agx-thor-baseboard -type f ! -name '._*' \
@@ -172,12 +176,12 @@ $(DIST)/tutorial-board-$(VERSION).tar.gz:
 	  | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
 
 # oracle-corpus: every board, both views. The KiCad reader cross-check reads a schematic and its
-# board file and compares the two net sets, so it needs the copper half that the tutorial does not.
+# board file, and compares the two net sets. So it needs the copper, which the tutorial doesn't.
 #
-# A board's params/ ships here too, the datasheet facts its design.yaml names.
+# Each board's params/ ships here too. Those are the datasheet facts its design.yaml names.
 #
 # The design.yaml descriptors ship here and NOT in tutorial-board. A descriptor names the board file
-# as a companion, and agni fails a read whose declared companion is missing, so a descriptor in the
+# as a companion, and agni fails a read when a declared companion is missing. So a descriptor in the
 # schematics-only tarball would break every read of the tutorial board.
 $(DIST)/oracle-corpus-$(VERSION).tar.gz:
 	@mkdir -p $(DIST)
@@ -187,39 +191,41 @@ $(DIST)/oracle-corpus-$(VERSION).tar.gz:
 	     -o -name 'design.yaml' -o -name '*.textproto' -o -name 'LICENSE' -o -name 'README.md' \) \
 	  | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
 
-# odb-altium: ODB++ jobs another tool wrote, byte-identical to their publishers' (foxBMS's, written by
-# Altium Designer). agni's gate reads them for the dialect KiCad's exporter never writes, so this one
-# stays small enough to fetch on every CI run.
+# odb-altium: ODB++ jobs Altium Designer wrote, byte-identical to their publisher's (foxBMS). agni's
+# gate reads them for parts of the format that KiCad's exporter never writes. This tarball is kept
+# small enough to fetch on every CI run.
 $(DIST)/odb-altium-$(VERSION).tar.gz:
 	@mkdir -p $(DIST)
 	find odb/altium -type f ! -name '._*' | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
 
-# odb-kicad: each KiCad board above exported to ODB++ by kicad-cli (odb-kicad-jobs). agni reads a
-# board both ways and requires the two to agree, which only makes sense beside oracle-corpus, so it
-# ships apart from the gate's artifacts.
+# odb-kicad: each KiCad board above, exported to ODB++ by kicad-cli (odb-kicad-jobs). agni reads a
+# board both ways and requires the two reads to agree. That check needs oracle-corpus beside it, so
+# this tarball ships apart from the gate's artifacts.
 $(DIST)/odb-kicad-$(VERSION).tar.gz:
 	@mkdir -p $(DIST)
 	find odb/kicad -type f ! -name '._*' | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
 
-# allegro: Allegro board files, byte-identical to their publishers', each beside an extract Allegro
-# wrote from the same board. agni's Allegro reader is held to the extract, so the two ship together.
+# allegro: Allegro boards, byte-identical to their publishers'. Each comes with an extract that
+# Allegro wrote from the same board. agni's Allegro reader is held to the extract, so the two ship
+# together.
 ALLEGRO_EXTRACT_BOARDS := allegro/beaglebone-ai
 $(DIST)/allegro-$(VERSION).tar.gz:
 	@mkdir -p $(DIST)
 	find $(ALLEGRO_EXTRACT_BOARDS) -type f ! -name '._*' | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
 
-# allegro-boards: the other Allegro boards. Three come with the files Allegro wrote beside them
-# (Gerbers and drill, a placement report, the OrCAD schematic), and three with an export of the same
-# board in cadence-exports. A read of the .brd is checked against those. About 100MB, so it ships
-# apart from allegro and a job that only needs the extract-backed board fetches less.
+# allegro-boards: the other Allegro boards. Three come with other files Allegro wrote beside them
+# (Gerbers and drill, a placement report, the OrCAD schematic). The other three have an export of the
+# same board in cadence-exports. A read of each .brd is checked against those files. The boards come
+# to about 100MB unpacked, so they ship apart from allegro. A job that needs only the extract-backed
+# board fetches less.
 $(DIST)/allegro-boards-$(VERSION).tar.gz:
 	@mkdir -p $(DIST)
 	find allegro -type f ! -name '._*' $(foreach b,$(ALLEGRO_EXTRACT_BOARDS),! -path '$(b)/*') \
 	  | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
 
-# cadence-exports: designs Cadence's tools wrote out in formats agni reads today, byte-identical to
-# their publishers'. The ODB++ jobs Allegro wrote sit under odb/allegro/, beside odb/altium/, and the
-# IPC-2581 and EDIF exports sit under cadence/ with a design.yaml each.
+# cadence-exports: designs that Cadence's tools exported in formats agni reads today, byte-identical
+# to their publishers'. The ODB++ jobs from Allegro sit under odb/allegro/, beside odb/altium/. The
+# IPC-2581 and EDIF exports sit under cadence/, each with a design.yaml.
 $(DIST)/cadence-exports-$(VERSION).tar.gz:
 	@mkdir -p $(DIST)
 	find odb/allegro cadence -type f ! -name '._*' | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
@@ -235,7 +241,7 @@ dist: $(DIST)/tutorial-board-$(VERSION).tar.gz $(DIST)/oracle-corpus-$(VERSION).
 	@echo
 	@cat $(DIST)/SHA256SUMS
 
-# What the engine pins. Paste these two lines into its samples fetch target.
+# What the engine pins. Paste the lines for the tarballs it fetches into its hack/samples.pin.
 list: dist
 	@echo
 	@echo "engine pin:"
@@ -251,9 +257,9 @@ clean:
 	rm -rf $(DIST)
 
 # Regenerates odb/kicad from the boards, with KiCad 9 or later. Precision 6 writes coordinates to the
-# nanometre. The exporter stamps the time it ran into two files of each job, and those stamps are
-# fixed so a regeneration with no board change rewrites nothing that matters; the .kicad_prl it
-# leaves beside a board with none is removed.
+# nanometre. The exporter stamps the time it ran into two files of each job. Those stamps are fixed,
+# so a regeneration with no board change rewrites nothing that matters. The exporter also leaves a
+# .kicad_prl beside a board that had none, and that file is removed.
 ODB_BOARDS := $(shell find boards -name '*.kicad_pcb' ! -path '*/nfc_antenna/*' | sort)
 odb-kicad-jobs:
 	@command -v kicad-cli >/dev/null || { echo "kicad-cli not found" >&2; exit 1; }

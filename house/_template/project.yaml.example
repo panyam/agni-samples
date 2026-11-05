@@ -1,8 +1,8 @@
-# Your team's project: the config every house board shares. Copy this file to project.yaml at the top
-# of your house folder (house/project.yaml, or $HOUSE_DIR/project.yaml), and give each board a
-# design.yaml that names it with `extends: ../project.yaml`.
+# Your team's project, which holds the config every house board shares. Copy this file to
+# project.yaml at the top of your house folder (house/project.yaml, or $HOUSE_DIR/project.yaml).
+# Give each board a design.yaml that names it with `extends: ../project.yaml`.
 #
-# Every section is optional. The shapes are in agni's guide, "Projects and designs":
+# Every section is optional. agni's guide, "Projects and designs", gives each one's shape:
 # https://github.com/panyam/agni/blob/main/docsite/content/guide/projects.md
 name: house
 title: Our boards
@@ -10,8 +10,8 @@ title: Our boards
 # Folders of the project's own files, each relative to this file. Create the ones you use.
 #   profiles: interface profiles (YAML), e.g. your own PCIe or CAN expectations
 #   params:   datasheet facts (PartSpec textprotos) for the parts you buy
-#   lib:      derived relations (.dl) your queries and checklist items can call
-#   queries:  query sets, which `make query SET=<name>` and the viewer's Sets menu open
+#   lib:      derived relations (.dl) for your queries and checklist items to call
+#   queries:  query sets, for `make query SET=<name>` and the viewer's Sets menu to open
 # profiles: [profiles]
 # params: [params]
 # lib: [lib]

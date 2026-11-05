@@ -2,16 +2,16 @@
 
 Your team's own boards, served and checked beside the public ones.
 
-This repo is public. Anything you `git add` here can end up pushed to it, so keep house boards in a
-folder outside the checkout and point `HOUSE_DIR` at it:
+This repo is public, so anything you `git add` here can end up pushed to it. Keep house boards in a
+folder outside the checkout, and point `HOUSE_DIR` at it:
 
 ```bash
 make serve HOUSE_DIR=~/work/house-boards
 ```
 
 If you do keep them here, git ignores everything in this folder except this README and `_template/`.
-`make verify` fails when any other file under `house/` is tracked, and `make setup` installs the same
-check as a pre-commit hook.
+`make verify` fails if any other file under `house/` is tracked. `make setup` installs the same check
+as a pre-commit hook.
 
 ## Adding a board
 
@@ -22,5 +22,5 @@ check as a pre-commit hook.
    DESIGN=mount://house/<board>` runs the rules on one.
 
 Every target in the top-level README takes `DESIGN=mount://house/<board>`. Reports go to `reports/`,
-which git also ignores. They carry every net name and reference designator, so they stay on your
-machine. `make intake` and `make trial` write the only reports meant to leave it.
+and git ignores that folder too. The reports carry every net name and reference designator, so they
+stay on your machine. Only the `make intake` and `make trial` reports are meant to leave it.

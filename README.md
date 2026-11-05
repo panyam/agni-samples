@@ -3,11 +3,12 @@
 Real, publicly-licensed electronic designs that [agni](https://github.com/panyam/agni) reads in its
 tests, its tutorial, and its reader cross-checks.
 
-None of these boards are ours.  Each was published by someone else under an open licence and sits in
-`boards/<name>/` with the upstream `LICENSE` and `README.md` it came with.  `PROVENANCE.md` records
-where each came from and what, if anything, was changed.
+None of these designs are ours.  Someone else published each one under an open licence.  Each
+folder keeps the upstream `LICENSE` that came with the design, and the KiCad boards under `boards/`
+keep their upstream `README.md` too.  `PROVENANCE.md` records where each design came from, and what
+was changed, if anything.
 
-They live in their own repo so that the engine repo stays a single licence and these keep theirs.
+They live in their own repo, so the engine repo keeps a single licence and these keep theirs.
 
 ## The boards
 
@@ -20,27 +21,27 @@ They live in their own repo so that the engine repo stays a single licence and t
 | `cynthion` | 348 | 17 | CERN-OHL-P |
 | `mnt-reform-motherboard30` | 529 | 13 | CERN-OHL-S |
 
-ODB++ jobs sit apart, under `odb/` (see `PROVENANCE.md`): foxBMS's five boards as Altium Designer
-wrote them (CC-BY-4.0), three boards as Allegro's tools wrote them (CERN-OHL-S, CC-BY-4.0, OCP
-permissive), and each KiCad board above as kicad-cli exports it.
+ODB++ jobs sit apart, under `odb/` (see `PROVENANCE.md`).  Altium Designer wrote foxBMS's five
+boards (CC-BY-4.0).  Allegro's tools wrote three more boards (CERN-OHL-S, CC-BY-4.0, OCP permissive).
+kicad-cli exported each KiCad board above.
 
-Cadence's other exports sit under `cadence/`, each with a `design.yaml`: the Parallella parasdr as
-Allegro wrote it to IPC-2581 (CC BY-SA 3.0 US), and Clay R6 as OrCAD Capture wrote it to EDIF (MIT).
+`cadence/` holds Cadence's other exports, and each has a `design.yaml`.  Allegro wrote the Parallella
+parasdr to IPC-2581 (CC BY-SA 3.0 US), and OrCAD Capture wrote Clay R6 to EDIF (MIT).
 
-Allegro boards sit under `allegro/`, each as BeagleBoard.org published it (CC-BY-4.0).  The
-BeagleBone AI comes with an extract Allegro wrote from it.  BeaglePlay, BeagleV-Fire and BeagleBone
-AI-64 come with the other files Allegro wrote beside each board: Gerbers and drill files, or a
-placement report.  Their `.brd` files span the three header families BeagleBoard's boards use.
-Three more `.brd` boards, pc069, the OpenCellular breakout and the Parallella parasdr, each come with
-an export their publisher released of the same board, under `odb/allegro/` or `cadence/`.
+`allegro/` holds Allegro boards, each as its publisher released it.  Four come from BeagleBoard.org
+(CC-BY-4.0).  The BeagleBone AI comes with an extract that Allegro wrote from it.  BeaglePlay,
+BeagleV-Fire and BeagleBone AI-64 come with other files Allegro wrote beside each board, such as
+Gerbers and drill files, or a placement report.  BeagleBoard's Allegro boards use three `.brd`
+header families, and these four cover all three.  The other three `.brd` boards are pc069, the
+OpenCellular breakout and the Parallella parasdr.  Each publisher also released an export of the
+same board, and those exports sit under `odb/allegro/` or `cadence/`.
 
 ## Opening them in agni
 
-A checkout is something `agni serve` can open as it stands.  `agni.yaml` at the root mounts `boards/`,
-`odb/`, `cadence/` and `house/`, so `agni check mount://boards/hackrf-one` works at the root with no
-flags.  Run it from the root: agni finds `agni.yaml` from a subfolder too, but reads its paths
-against the folder you're in.
-You need agni v0.4.0 or later, the first release with the ODB++ reader.
+`agni serve` can open a checkout as it stands.  `agni.yaml` at the root mounts `boards/`, `odb/`,
+`cadence/` and `house/`, so `agni check mount://boards/hackrf-one` works at the root with no flags.
+Run it from the root.  agni finds `agni.yaml` from a subfolder too, but then reads its paths against
+the folder you're in.  You need agni v0.4.0 or later, the first release with the ODB++ reader.
 
 ```bash
 make serve        # the viewer over every board, job and house board, at http://127.0.0.1:8080/
@@ -54,25 +55,28 @@ viewer.  A dev build (`make agni` in an agni checkout) carries none, so name its
 wasm engine built there as well (`make ui wasm`).  `PORT` moves the server, and `MCP=1` also serves
 agni's analysis to an agent at `/mcp`.
 
-In `serve-wasm` a design bigger than serve's `--wasm-max-bytes` (128 MB) goes to the server engine,
-and the page says so.  Jetson is about 92 MB, so every board here runs in the browser.
+`serve-wasm` caps a design at serve's `--wasm-max-bytes` (128 MB).  A bigger one goes to the server
+engine, and the page says so.  Jetson is about 92 MB, so every board here runs in the browser.
 
 `make verify` checks that each board folder has a `design.yaml` and a `PROVENANCE.md` section, and
-that no `project.yaml` sits over the boards.  `make verify AGNI=agni` also reads every board, job
-and house board, and fails on one that reads as no components.  `make test` checks those checks.  CI runs both.
+that no `project.yaml` sits over the boards.  It also checks that each folder under `allegro/`,
+`odb/allegro/` and `cadence/` has a `LICENSE` and a `PROVENANCE.md` heading, and that each design
+under `cadence/` has a `design.yaml`.  `make verify AGNI=agni` also reads every design, job and house
+board, and fails on any that reads as no components.  `make test` checks those checks, and CI runs
+both.
 
 ## Your own boards beside these
 
 A team can clone this repo and run every analysis on its own boards, after seeing each one work on a
 public board first.  `make tour` runs every target below on Glasgow.
 
-Your boards go in a third mount, `house`.  It defaults to `house/` in the checkout, and
+Your boards go in their own mount, `house`.  It defaults to `house/` in the checkout, and
 `HOUSE_DIR=<folder>` moves it.  A folder outside the checkout is safer, since this repo is public.
 `house/README.md` walks through adding a board from the template, with a `project.yaml` for your
 team's conventions, checklists and query sets.  `make setup` installs a pre-commit hook that refuses
 a commit with a house board in it.
 
-Each target runs one agni command over `DESIGN=mount://...`, which defaults to Glasgow:
+Each target runs one agni command over `DESIGN=mount://...`.  `DESIGN` defaults to Glasgow.
 
 | target | runs |
 |---|---|
@@ -81,14 +85,15 @@ Each target runs one agni command over `DESIGN=mount://...`, which defaults to G
 | `make diff A=... B=...` | the structural diff of two revisions or two views.  `RENAME_APPROX=1` pairs renamed nets that also changed |
 | `make query SET=...` | a query set.  Defaults to `examples/queries.yaml` |
 | `make trace FROM=U1.51 TO=U14.3` | the series path between two pins |
-| `make lexicon` | the vocabulary agni reads the design's names with |
-| `make pinmap` | a row per pin the design's `io_map` declares, in `reports/<name>-pins.csv` |
+| `make lexicon` | the vocabulary agni uses to read the design's names |
+| `make pinmap` | a row for each pin in the design's `io_map`, in `reports/<name>-pins.csv` |
 | `make intake` | the sanitized summary, with no net name in it |
 | `make trial` | the `agni trial` report, with no name from the design in it |
 
-`reports/` is gitignored.  Everything in it except the intake and trial reports carries your net names
-and reference designators.  These variables come from the make command line only, so a `DESIGN`
-exported for another project's Makefile doesn't reach these targets.
+`reports/` is gitignored.  Every report in it carries your net names and reference designators,
+except the intake and trial reports.  `DESIGN` and the other variables in the table take a value
+from the make command line only.  So if your shell exports `DESIGN` for another project's Makefile,
+these targets don't see it.
 
 ## Using these from the engine
 
@@ -119,17 +124,19 @@ release rather than against a local rebuild, since archive metadata varies betwe
    be redistributed here whatever its origin.  Permissive and reciprocal open-hardware licences are
    fine (PROVENANCE.md, "Reciprocal licences").  NonCommercial terms are not.
 2. Copy the design **verbatim**, including its `LICENSE` and `README.md`.  Some tests compare a read
-   against the upstream tool's own output, so an edited file stops being usable as a reference.
+   against the upstream tool's own output, and an edited file can't serve as that reference.
 3. Drop editor state and renders (`.kicad_prl`, `.lck`, `img/`).  Keep symbol and footprint libraries,
    since resolving them is under test.
 4. Add a section to `PROVENANCE.md`: upstream, source, licence, date taken, and any modification.
 5. Add a `design.yaml` naming its entry and companions (agni's `agni propose <folder>` drafts one).
-   It is served on the next `make serve`.  Don't add a `project.yaml` above it: a design under a
-   `project.yaml` that it does not `extends` fails to load.
+   The next `make serve` serves it.  Don't add a `project.yaml` above it.  agni fails to load a
+   design that sits under a `project.yaml` without naming it in `extends`.
 6. Run `make verify AGNI=agni`.
 7. Add it to a tarball target in the `Makefile` if a test needs it.
 
 ## Licence
 
-Each design carries its own licence, board by board, and those govern the design files.  `LICENSE` at
-the top level covers only the packaging in this repo: the makefile and the provenance records.
+Each design carries its own licence, and that licence governs its design files.  The top-level
+`LICENSE` (Apache-2.0) covers only what this repo adds around them.  That means the Makefile, the
+scripts under `hack/`, the `examples/` and `house/` templates, the provenance records, and the
+`design.yaml` descriptors and `params/` facts that agni adds to a design.

@@ -1,5 +1,5 @@
 # Added by agni, not part of the upstream design (see PROVENANCE.md). Analysis reads the EDIF netlist
-# OrCAD Capture wrote.
+# that OrCAD Capture wrote.
 name: clay-r6
 title: Clay R6
 entry: CLAYR6.EDF

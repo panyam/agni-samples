@@ -1,10 +1,10 @@
 # Provenance
 
-One section per board: who published it, under what terms, and what was changed.
+One section per design: who published it, under what terms, and what was changed.
 
-The modification line is the one that matters.  Some agni tests compare a read of a design against the
-output of the tool that produced it, so an edited file stops being usable as a reference.  The
-expected answer is "none".
+Read the modification line first.  Some agni tests compare a read of a design against the output of
+the tool that produced it, and an edited file can't serve as that reference.  So the expected
+answer is "none".
 
 ## jetson-agx-thor-baseboard
 
@@ -96,8 +96,8 @@ KiCad 7 format (`20230121`). 17 sheets, 348 components, 375 nets as KiCad 10 res
 | Added | `design.yaml`, agni's descriptor (Apache-2.0); `README.md` is the repo root's, which states the licences and the MNT trademark terms |
 
 KiCad 8 format (`20231120`). 13 sheets, 529 components, 681 nets as KiCad 10 resolves them. The
-"MNT" and "MNT Reform" marks are MNT Research's trademarks and are not licensed by CERN-OHL-S; the
-files are redistributed unmodified, which is what the marks permit.
+"MNT" and "MNT Reform" marks are MNT Research's trademarks, and CERN-OHL-S doesn't license them. The
+trademark terms permit redistributing the files unmodified, and this repo does only that.
 
 ## ODB++ jobs (`odb/`)
 
@@ -113,10 +113,10 @@ files are redistributed unmodified, which is what the marks permit.
 | Modifications | **None.**  Each `<board>.odb.zip` is the published ODB++ archive, byte-identical, renamed for the board it belongs to. |
 | Not included | the Altium sources, schematics PDFs, BOMs and Gerbers in the same packages |
 
-Five boards (extension, interface, master, the two slaves), 74 to 591 parts, 11 to 14 layers. They are
-the engine's first ODB++ jobs from a tool other than KiCad, so agni's gate reads them for the dialect
-KiCad's exporter never writes: feature groups, through-hole pads, silkscreen text records, no
-`misc/info`.
+Five boards: extension, interface, master, and the two slaves. They have 74 to 591 parts and 11 to 14
+layers. They were the engine's first ODB++ jobs from a tool other than KiCad. agni's gate reads them
+for parts of the format that KiCad's exporter never writes, such as feature groups, through-hole
+pads and silkscreen text records, and for a job with no `misc/info`.
 
 ### KiCad boards, exported by kicad-cli (`odb/kicad/`)
 
@@ -126,17 +126,17 @@ KiCad's exporter never writes: feature groups, through-hole pads, silkscreen tex
 | Made with | `kicad-cli pcb export odb --compression none --precision 6`, KiCad 10.0.6 (`make odb-kicad-jobs`) |
 | Modifications | **Derived.**  Each is KiCad's export of the board beside it, with the two export timestamps fixed so a regeneration is stable.  Its licence is the board's. |
 
-agni reads each board from its `.kicad_pcb` and from its export and requires the two to agree, so
-the source of the export is also its oracle.
+agni reads each board twice, from its `.kicad_pcb` and from its export, and requires the two reads to
+agree. So the board each export came from also serves as its oracle.
 
 ### Allegro jobs (`odb/allegro/`)
 
-ODB++ jobs that came out of Cadence Allegro, each byte-identical to the file its publisher released,
-checked against git's blob hash or, for the Git LFS file, the pointer's sha256. Each job's
-`misc/info` names an Allegro extract as its source. They differ in what wrote the job file itself,
-which the `SAVE_APP` line records, so the three together cover Allegro's own ODB++ writer and the two
-Valor tools that turn an Allegro extract into a job. Files are renamed to `<name>.odb.tgz`, the
-convention `odb/` uses.
+These ODB++ jobs came out of Cadence Allegro. Each is byte-identical to the file its publisher
+released. Each was checked against git's blob hash, and the Git LFS one against its pointer's sha256.
+Each job's `misc/info` names an Allegro extract as its source. The `SAVE_APP` line names the tool
+that wrote the job file itself, and it differs across the three. One was Allegro's own ODB++ writer,
+and the other two were Valor tools that turn an Allegro extract into a job. Each file is renamed to
+`<name>.odb.tgz`, following the convention in `odb/`.
 
 ### pc069 rev c, written by Allegro (`odb/allegro/pc069/`)
 
@@ -194,23 +194,23 @@ and 12 layers.
 | Modifications | **None.**  Both files are byte-identical to upstream. |
 | Not included | the OrCAD schematic (`.dsn`), the RevA2 board, Gerbers, BOMs and PDFs |
 
-An Allegro 17.2 board: 716 components, 12 copper layers. `cds2f_BeagleBone-AI.txt` is an Allegro
-extract written from this board, as its `J!` header row records. It lists each component's placement,
-each pin's net, name and position, the vias and their nets, and the padstacks per layer, so agni's
-Allegro reader is held to it.
+An Allegro 17.2 board, with 716 components and 12 copper layers. Allegro wrote
+`cds2f_BeagleBone-AI.txt` from this board, as the extract's `J!` header row records. It lists each
+component's placement, and each pin's net, name and position. It also lists the vias with their nets,
+and the padstacks on each layer. agni's Allegro reader is held to it.
 
 ### The other Allegro boards
 
-No publisher released an extract for these three, so they ship in `allegro-boards` with the files
-Allegro wrote beside each board. A `.brd` read can be checked against those: copper and holes
-against the Gerbers and drill files, and part positions against a placement report.
+No publisher released an extract for these three. So they ship in `allegro-boards` with the other
+files Allegro wrote beside each board, and a `.brd` read can be checked against those. The Gerbers
+and drill files check copper and holes, and a placement report checks part positions.
 
 Each `.brd` opens with a 4-byte header word. BeagleBoard's Allegro boards use three of them, and
-these three boards are one of each. The BeagleBone AI above and the AI-64 share `00 04 14 00`, the
-header of a board the section above records as Allegro 17.2. BeaglePlay has `02 09 14 00`, which BeagleV-Ahead and PocketBeagle
-2 share. BeagleV-Fire has `02 15 14 00`, which BeagleY-AI shares. The `.brd` files carry no readable
-version string. The Gerbers name their writer: Allegro 17.4-S032 for BeaglePlay and 17.4-S031 for
-BeagleV-Fire, so both later headers come from 17.4 builds.
+these three boards have one each. The AI-64 shares `00 04 14 00` with the BeagleBone AI, and the
+section above records the BeagleBone AI as Allegro 17.2. BeaglePlay has `02 09 14 00`, and so do
+BeagleV-Ahead and PocketBeagle 2. BeagleV-Fire has `02 15 14 00`, and so does BeagleY-AI. The `.brd`
+files carry no readable version string. The Gerbers name their writer, Allegro 17.4-S032 for
+BeaglePlay and 17.4-S031 for BeagleV-Fire, so both later headers come from 17.4 builds.
 
 Files keep their upstream paths under each board's folder. Allegro's numbered backups
 (`art_param.txt,1`, `nc_param.txt,1`) are left out as editor state.
@@ -265,10 +265,11 @@ with its device, package, position, rotation and side.
 
 ### Allegro boards with their own export
 
-Each of these boards' publishers also released an export of the same board, which sits in the
-`cadence-exports` tarball. A `.brd` read can be held to it, pin by pin and net by net. Each file is
-byte-identical to upstream, checked against git's blob hash, and each `LICENSE` is the same repo's
-licence as beside its export. Their header words add three more families to the three above.
+The publisher of each of these boards also released an export of the same board. Those exports ship
+in the `cadence-exports` tarball, and a `.brd` read can be held to its export, pin by pin and net by
+net. Each file is byte-identical to upstream, checked against git's blob hash. Each board's `LICENSE`
+is a copy of the one beside its export, since both come from the same repo. Their header words add
+three more families to the three above.
 
 ### pc069 rev c board (`allegro/pc069/`)
 
@@ -303,8 +304,8 @@ licence as beside its export. Their header words add three more families to the 
 
 ## Cadence exports (`cadence/`)
 
-Designs as Cadence's tools exported them, in formats agni reads today. Each has a `design.yaml`
-naming the export as its entry, so the `cadence` mount serves it like a board.
+These are designs as Cadence's tools exported them, in formats agni reads today. Each has a
+`design.yaml` that names the export as its entry, so the `cadence` mount serves it like a board.
 
 ### Parallella parasdr (`cadence/parallella-parasdr/`)
 
@@ -320,10 +321,10 @@ naming the export as its entry, so the `cadence` mount serves it like a board.
 | Added | `design.yaml`, agni's descriptor (Apache-2.0) |
 
 `parasdr_ipc2581.xml` is IPC-2581 revision B. Its header names `<SoftwarePackage name="Allegro"
-vendor="Cadence">`. agni reads 404 components, 157 nets and 19 layers. `parasdr_odb++.xml` is the same
-board as ODB++X (ODX), written by "UNDISCLOSED Allegro SPB16.6" on 2014-08-22. agni has no ODX
-reader yet, so the descriptor doesn't name it. With one, the two files would hold each other to the
-same board.
+vendor="Cadence">`. agni reads 404 components, 157 nets and 19 layers. `parasdr_odb++.xml` holds the
+same board as ODB++X (ODX). "UNDISCLOSED Allegro SPB16.6" wrote it on 2014-08-22. agni has no ODX
+reader yet, so the descriptor doesn't name it. Once agni can read ODX, each file can check the other
+against the same board.
 
 ### Clay R6 (`cadence/clay-r6/`)
 
@@ -343,22 +344,23 @@ reads 74 components and 52 nets.
 
 ## Reciprocal licences
 
-A strongly reciprocal licence (CERN-OHL-S, GPL) obliges whoever distributes a MODIFIED design or a
-product made from it to release their changes under the same terms. This repo redistributes the
-designs unmodified with their licence, which every one of these licences allows, and agni reading a
-design in a test makes agni neither a modification nor a product of it. So reciprocal boards are
-accepted. This reverses the earlier exclusion of `cm5_minima`, which can be added the same way.
+Suppose someone distributes a MODIFIED design under a strongly reciprocal licence (CERN-OHL-S, GPL),
+or a product made from one. That licence obliges them to release their changes under the same terms.
+This repo redistributes the designs unmodified, with their licence, and every one of these licences
+allows that. agni reading a design in a test doesn't make agni a modification of it, or a product of
+it. So reciprocal boards are accepted. This reverses the earlier exclusion of `cm5_minima`, which can
+be added the same way.
 
 ## Boards not included
 
-Other designs were considered and left out.  Recorded here so the survey is not repeated.
+These designs were considered and left out.  They're recorded here so nobody repeats the survey.
 
 | board | reason |
 |---|---|
 | `pic_programmer`, `complex_hierarchy`, `video`, `interf_u`, `kit-dev-coldfire-xilinx_5213` | no LICENSE file, so nothing grants redistribution |
 | `stickhub` | CC BY-NC-SA, NonCommercial |
-| `openair-max` | CC BY-SA |
+| `openair-max` | CC BY-SA, left out as reciprocal before "Reciprocal licences" above reversed that rule |
 | Framework Laptop expansion cards | CC-BY-4.0 and fine to ship, but KiCad 5 format, which agni does not read |
 
-A test needing one of these should read it from a local KiCad installation and skip loudly when it is
-absent, never silently.
+If a test needs one of these, it should read it from a local KiCad installation. When the file is
+absent, the test should skip loudly, never silently.

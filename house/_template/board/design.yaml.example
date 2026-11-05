@@ -8,13 +8,14 @@ extends: ../project.yaml
 # The file analysis reads, normally the schematic or the netlist.
 entry: my-board.kicad_sch
 
-# Other views of the same board: the copper, an export. agni draws and checks against them, and
-# never reads one as a second source of parts.
+# Other views of the same board, such as the copper or an export. agni draws them and checks against
+# them, but never reads one as a second source of parts.
 companions:
   - my-board.kicad_pcb
 
-# Optional: what you intend, for the rules that check against it. A connector declared internal is
-# not treated as a way into the product. `io_map` declares the pin map that `make pinmap` signs off.
+# Optional: what you intend, for the rules that check against it. agni doesn't treat a connector
+# declared internal as a way into the product. `io_map` declares the pin map for `make pinmap` to
+# sign off.
 # intent:
 #   components:
 #     J1: {exposure: internal}
