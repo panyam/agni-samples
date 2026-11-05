@@ -41,12 +41,16 @@ OpenCellular breakout.  Each publisher also released an ODB++ job of the same bo
 ## Opening them in agni
 
 `agni serve` can open a checkout as it stands.  `agni.yaml` at the root mounts `boards/`, `odb/`,
-`cadence/` and `house/`, so `agni check mount://boards/hackrf-one` works at the root with no flags.
+`cadence/`, `allegro/`, `altium/` and `house/`, so `agni check mount://boards/hackrf-one` works at the
+root with no flags.
 Run it from the root.  agni finds `agni.yaml` from a subfolder too, but then reads its paths against
-the folder you're in.  You need agni v0.4.0 or later, the first release with the ODB++ reader.
+the folder you're in.  You need agni v0.5.0 or later, the first release that reads Altium and
+Allegro boards.  It opens all five `.PcbDoc` boards and five of the eight Allegro `.brd` boards,
+counting the two under `cadence/`.  BeaglePlay (Allegro 17.4), BeagleV-Fire (17.5) and pc069 were
+saved by releases agni does not read yet (agni issue 1355).
 
 ```bash
-make serve        # the viewer over every board, job and house board, at http://127.0.0.1:8080/
+make serve        # the viewer over every board, job, native board and house board, at http://127.0.0.1:8080/
 make serve-wasm   # the same, with each design analysed in your browser
 make site         # the whole set as static files in site/, the way agni's public demo is built
 ```

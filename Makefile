@@ -41,13 +41,14 @@ all: dist
 # MCP=1 also serves agni's analysis to an agent at /mcp. The house mount holds a team's own boards
 # (house/README.md), and HOUSE_DIR moves it to a folder outside the checkout.
 #
-# Every target names all four mounts, because a --mount replaces agni.yaml's whole table.
+# Every target names all six mounts, because a --mount replaces agni.yaml's whole table.
 AGNI      ?= agni
 PORT      ?= 8080
 WEB_DIR   ?=
 SITE_DIR  ?= site
 HOUSE_DIR ?= house
-MOUNTS    := --mount boards=boards --mount odb=odb --mount cadence=cadence --mount house=$(HOUSE_DIR)
+MOUNTS    := --mount boards=boards --mount odb=odb --mount cadence=cadence --mount allegro=allegro --mount altium=altium \
+             --mount house=$(HOUSE_DIR)
 WEB_FLAG  = $(if $(WEB_DIR),--web-dir $(WEB_DIR))
 SERVE     = $(AGNI) serve $(MOUNTS) --addr 127.0.0.1:$(PORT) $(WEB_FLAG) $(if $(MCP),--mcp)
 
