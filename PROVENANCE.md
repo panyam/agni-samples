@@ -351,16 +351,19 @@ against the same board.
 | | |
 |---|---|
 | Upstream | Clay, revision 6, by Michael Gubbels |
-| Source | [ah-cog/Clay](https://github.com/ah-cog/Clay), `Circuit/R6_1/CLAYR6.EDF`, commit `31a84237` |
+| Source | [ah-cog/Clay](https://github.com/ah-cog/Clay), `Circuit/R6_1/CLAYR6.EDF` and `Circuit/R6_1/allegro/CLAYR6.brd`, commit `31a84237` |
 | Licence | MIT (`cadence/clay-r6/LICENSE`, the repo's own) |
 | Copyright | (c) 2014 Michael Gubbels |
 | Taken | 2026-11-05 |
-| Modifications | **None.**  The file is byte-identical to upstream. |
-| Not included | the OrCAD `.DSN`, the Allegro `.brd`, and the firmware |
+| Modifications | **None.**  Both files are byte-identical to upstream. |
+| Not included | the OrCAD `.DSN`, the earlier revisions' boards and Gerbers, and the firmware |
 | Added | `design.yaml`, agni's descriptor (Apache-2.0) |
 
 EDIF 2.0.0 from OrCAD Capture: `program "cap2edif"`, `dataOrigin "OrCAD Capture"`, SPB 16.60. agni
-reads 74 components and 52 nets.
+reads 74 components and 52 nets. `CLAYR6.brd` (added 2026-11-05, SHA-256 `31784808...5f694f`) is the
+same revision's Allegro board, header `03 15 13 00`, which is Allegro 16.6. Its EDIF is its second
+view, so it is the board agni's cross-probe walk runs on for an EDIF design (panyam/agni#1382), once
+agni reads 16.6 (panyam/agni#1355).
 
 ## Reciprocal licences
 
