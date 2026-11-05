@@ -23,13 +23,15 @@ for d in boards/*/; do
   grep -qxF "## $name" PROVENANCE.md 2>/dev/null || bad "boards/$name has no '## $name' section in PROVENANCE.md"
 done
 
-# An Allegro board has no design.yaml, since agni can't read a .brd yet. It still needs the
-# publisher's licence beside it and a PROVENANCE.md heading naming its folder.
-for d in allegro/*/; do
+# Each Allegro board, Allegro ODB++ job and Cadence export needs the publisher's licence beside it
+# and a PROVENANCE.md heading naming its folder. A Cadence export also needs a design.yaml, since
+# agni reads it as a design. An Allegro board has none, since agni can't read a .brd yet.
+for d in allegro/*/ odb/allegro/*/ cadence/*/; do
   [ -d "$d" ] || continue
   dir=${d%/}
   [ -f "$dir/LICENSE" ] || bad "$dir has no LICENSE"
   grep -qE "^#+ .*\(\`$dir/\`\)" PROVENANCE.md 2>/dev/null || bad "$dir has no PROVENANCE.md heading naming (\`$dir/\`)"
+  case $dir in cadence/*) [ -f "$dir/design.yaml" ] || bad "$dir has no design.yaml" ;; esac
 done
 
 for p in project.yaml boards/project.yaml; do
@@ -37,7 +39,7 @@ for p in project.yaml boards/project.yaml; do
 done
 
 # A team's house boards stay out of this public repo. Only the README and the template are tracked
-# under house/, and no tracked file may name a mount beyond the three agni.yaml declares, since one
+# under house/, and no tracked file may name a mount beyond the four agni.yaml declares, since one
 # naming mount://<team-folder> is a house path on its way to being pushed. Both read git's index, so
 # they also see what is staged, which is what the pre-commit hook needs.
 if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
@@ -49,18 +51,18 @@ if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   done < <(git ls-files -- house)
 
   while IFS= read -r hit; do
-    bad "$hit names a mount other than boards, odb or house"
+    bad "$hit names a mount other than boards, odb, cadence or house"
   done < <(git ls-files -z | xargs -0 grep -IHnoE 'mount://[A-Za-z0-9][A-Za-z0-9_.-]*' 2>/dev/null \
-             | grep -vE ':mount://(boards|odb|house)$')
+             | grep -vE ':mount://(boards|odb|cadence|house)$')
 fi
 
 if [ -n "${AGNI:-}" ]; then
   # house/ is read too, so a team's own boards get the same check. When HOUSE_DIR moves it, every
-  # read names all three mounts, because a --mount replaces agni.yaml's whole table.
+  # read names all four mounts, because a --mount replaces agni.yaml's whole table.
   house=${HOUSE_DIR:-house}
   mounts=()
-  [ "$house" = house ] || mounts=(--mount boards=boards --mount odb=odb --mount "house=$house")
-  designs=$(find boards -name design.yaml ! -path '*/._*' -exec dirname {} \; 2>/dev/null | sort)
+  [ "$house" = house ] || mounts=(--mount boards=boards --mount odb=odb --mount cadence=cadence --mount "house=$house")
+  designs=$(find boards cadence -name design.yaml ! -path '*/._*' -exec dirname {} \; 2>/dev/null | sort)
   house_designs=$(find "$house" -name design.yaml ! -path '*/._*' ! -path '*/_template/*' -exec dirname {} \; 2>/dev/null | sort)
   jobs=$(find odb -type f \( -name '*.odb.tgz' -o -name '*.odb.zip' \) ! -name '._*' 2>/dev/null | sort)
   uris=$(for p in $designs $jobs; do echo "mount://$p"; done

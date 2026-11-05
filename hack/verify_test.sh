@@ -18,7 +18,8 @@ clean_tree() {
   mkdir -p "$t/boards/alpha" "$t/odb"
   printf 'name: alpha\nentry: alpha.kicad_sch\n' > "$t/boards/alpha/design.yaml"
   printf '# Provenance\n\n## alpha\n\nfrom somewhere\n' > "$t/PROVENANCE.md"
-  printf 'mounts:\n  boards: boards\n  odb: odb\n  house: house\n' > "$t/agni.yaml"
+  printf 'mounts:\n  boards: boards\n  odb: odb\n  cadence: cadence\n  house: house\n' > "$t/agni.yaml"
+  mkdir -p "$t/cadence"
   mkdir -p "$t/house/_template"
   printf 'house\n' > "$t/house/README.md"
   printf 'name: house\n' > "$t/house/_template/project.yaml.example"
@@ -75,6 +76,29 @@ expect fail "an Allegro board with no LICENSE" "$t"
 t=$work/allegro-no-provenance; allegro_tree "$t"; printf '# Provenance\n\n## alpha\n' > "$t/PROVENANCE.md"
 expect fail "an Allegro board with no PROVENANCE.md section" "$t"
 
+cadence_tree() {
+  clean_tree "$1"; mkdir -p "$1/cadence/gizmo" "$1/odb/allegro/gadget"
+  printf 'name: gizmo\nentry: gizmo.edf\n' > "$1/cadence/gizmo/design.yaml"
+  printf 'MIT\n' > "$1/cadence/gizmo/LICENSE"; printf 'MIT\n' > "$1/odb/allegro/gadget/LICENSE"
+  printf '\n### Gizmo (`cadence/gizmo/`)\n\n### Gadget (`odb/allegro/gadget/`)\n' >> "$1/PROVENANCE.md"
+}
+
+t=$work/cadence-clean; cadence_tree "$t"
+expect pass "a Cadence export and an Allegro ODB++ job with licences and sections" "$t"
+
+t=$work/cadence-no-descriptor; cadence_tree "$t"; rm "$t/cadence/gizmo/design.yaml"
+expect fail "a Cadence export with no design.yaml" "$t"
+
+t=$work/cadence-no-provenance; cadence_tree "$t"; printf '# Provenance\n\n## alpha\n' > "$t/PROVENANCE.md"
+expect fail "a Cadence export with no PROVENANCE.md section" "$t"
+
+t=$work/allegro-odb-no-licence; cadence_tree "$t"; rm "$t/odb/allegro/gadget/LICENSE"
+expect fail "an Allegro ODB++ job with no LICENSE" "$t"
+
+t=$work/cadence-mount; cadence_tree "$t"
+printf 'mount://cadence/gizmo\n' > "$t/notes.md"; git -C "$t" add notes.md
+expect pass "a tracked file naming the cadence mount" "$t"
+
 t=$work/house-board; clean_tree "$t"; mkdir -p "$t/house/widget"
 printf 'name: widget\n' > "$t/house/widget/design.yaml"; git -C "$t" add -f house/widget/design.yaml
 expect fail "a tracked file under house/" "$t"
@@ -119,6 +143,14 @@ if [ -n "${AGNI:-}" ]; then
   printf '(kicad_sch (version 20231120) (generator "eeschema") (uuid "00000000-0000-0000-0000-000000000000") (paper "A4"))\n' \
     > "$work/elsewhere/widget/widget.kicad_sch"
   HOUSE_DIR=$work/elsewhere expect fail "a house board in HOUSE_DIR that reads as zero components" "$t" "$AGNI"
+
+  t=$work/cadence-read; cadence_tree "$t"; rm -r "$t/boards/alpha"
+  cp "$repo/cadence/clay-r6/CLAYR6.EDF" "$t/cadence/gizmo/gizmo.edf"
+  expect pass "a Cadence export reads" "$t" "$AGNI"
+
+  t=$work/cadence-empty; cadence_tree "$t"; rm -r "$t/boards/alpha"
+  printf '(edif empty (edifVersion 2 0 0) (edifLevel 0) (keywordMap (keywordLevel 0)))\n' > "$t/cadence/gizmo/gizmo.edf"
+  expect fail "a Cadence export that reads as zero components" "$t" "$AGNI"
 
   t=$work/bad-odb; clean_tree "$t"; rm -r "$t/boards/alpha"; : > "$t/PROVENANCE.md"
   mkdir -p "$t/odb/kicad"; printf 'not a tarball' > "$t/odb/kicad/broken.odb.tgz"

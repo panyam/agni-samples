@@ -40,13 +40,13 @@ all: dist
 # MCP=1 also serves agni's analysis to an agent at /mcp. HOUSE_DIR moves the house mount, a team's
 # own boards (house/README.md), to a folder outside the checkout.
 #
-# Every target names all three mounts, because a --mount replaces agni.yaml's whole table.
+# Every target names all four mounts, because a --mount replaces agni.yaml's whole table.
 AGNI      ?= agni
 PORT      ?= 8080
 WEB_DIR   ?=
 SITE_DIR  ?= site
 HOUSE_DIR ?= house
-MOUNTS    := --mount boards=boards --mount odb=odb --mount house=$(HOUSE_DIR)
+MOUNTS    := --mount boards=boards --mount odb=odb --mount cadence=cadence --mount house=$(HOUSE_DIR)
 WEB_FLAG  = $(if $(WEB_DIR),--web-dir $(WEB_DIR))
 SERVE     = $(AGNI) serve $(MOUNTS) --addr 127.0.0.1:$(PORT) $(WEB_FLAG) $(if $(MCP),--mcp)
 
@@ -63,7 +63,7 @@ serve-wasm:
 # The viewer needs a web/ with the wasm engine built (`make ui wasm` in an agni checkout).
 site:
 	$(AGNI) site $(SITE_DIR) $(WEB_FLAG) \
-	  $(foreach b,$(notdir $(wildcard boards/*)),--seed $(b)=boards/$(b)) --seed odb=odb
+	  $(foreach b,$(notdir $(wildcard boards/*)),--seed $(b)=boards/$(b)) --seed odb=odb --seed cadence=cadence
 
 # Each board folder has a design.yaml and a PROVENANCE.md section, and no project.yaml sits over
 # them. Name an agni to read every design too: make verify AGNI=agni. Without one the reads are
@@ -208,18 +208,26 @@ $(DIST)/allegro-$(VERSION).tar.gz:
 	@mkdir -p $(DIST)
 	find $(ALLEGRO_EXTRACT_BOARDS) -type f ! -name '._*' | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
 
-# allegro-boards: the other Allegro boards, one per .brd header family, with the files Allegro wrote
-# beside them (Gerbers and drill, a placement report, the OrCAD schematic). No publisher released an
-# extract for these, so a read of the .brd is checked against those instead. About 90MB, so it ships
+# allegro-boards: the other Allegro boards. Three come with the files Allegro wrote beside them
+# (Gerbers and drill, a placement report, the OrCAD schematic), and three with an export of the same
+# board in cadence-exports. A read of the .brd is checked against those. About 100MB, so it ships
 # apart from allegro and a job that only needs the extract-backed board fetches less.
 $(DIST)/allegro-boards-$(VERSION).tar.gz:
 	@mkdir -p $(DIST)
 	find allegro -type f ! -name '._*' $(foreach b,$(ALLEGRO_EXTRACT_BOARDS),! -path '$(b)/*') \
 	  | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
 
+# cadence-exports: designs Cadence's tools wrote out in formats agni reads today, byte-identical to
+# their publishers'. The ODB++ jobs Allegro wrote sit under odb/allegro/, beside odb/altium/, and the
+# IPC-2581 and EDIF exports sit under cadence/ with a design.yaml each.
+$(DIST)/cadence-exports-$(VERSION).tar.gz:
+	@mkdir -p $(DIST)
+	find odb/allegro cadence -type f ! -name '._*' | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
+
 dist: $(DIST)/tutorial-board-$(VERSION).tar.gz $(DIST)/oracle-corpus-$(VERSION).tar.gz \
       $(DIST)/odb-altium-$(VERSION).tar.gz $(DIST)/odb-kicad-$(VERSION).tar.gz \
-      $(DIST)/allegro-$(VERSION).tar.gz $(DIST)/allegro-boards-$(VERSION).tar.gz
+      $(DIST)/allegro-$(VERSION).tar.gz $(DIST)/allegro-boards-$(VERSION).tar.gz \
+      $(DIST)/cadence-exports-$(VERSION).tar.gz
 	@cd $(DIST) && shasum -a 256 *-$(VERSION).tar.gz > SHA256SUMS
 	@echo
 	@echo "built $(VERSION):"
