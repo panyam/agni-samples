@@ -23,6 +23,31 @@ They live in their own repo so that the engine repo stays a single licence and t
 ODB++ jobs sit apart, under `odb/` (see `PROVENANCE.md`): foxBMS's five boards as Altium Designer
 wrote them (CC-BY-4.0), and each KiCad board above as kicad-cli exports it.
 
+## Opening them in agni
+
+A checkout is something `agni serve` can open as it stands.  `agni.yaml` at the root mounts `boards/`
+and `odb/`, so `agni check mount://boards/hackrf-one` works from anywhere inside it with no flags.
+You need agni v0.4.0 or later, the first release with the ODB++ reader.
+
+```bash
+make serve        # the viewer over every board and job, at http://127.0.0.1:8080/
+make serve-wasm   # the same, with each design analysed in your browser
+make site         # the whole set as static files in site/, the way agni's public demo is built
+```
+
+`AGNI` names the binary and defaults to the `agni` on your PATH.  A release binary carries the
+viewer.  A dev build (`make agni` in an agni checkout) carries none, so name its `web/` too:
+`make serve AGNI=../agni/bin/agni WEB_DIR=../agni/web`.  `make site` and `make serve-wasm` need the
+wasm engine built there as well (`make ui wasm`).  `PORT` moves the server, and `MCP=1` also serves
+agni's analysis to an agent at `/mcp`.
+
+In `serve-wasm` a design bigger than serve's `--wasm-max-bytes` (128 MB) goes to the server engine,
+and the page says so.  Jetson is about 92 MB, so every board here runs in the browser.
+
+`make verify` checks that each board folder has a `design.yaml` and a `PROVENANCE.md` section, and
+that no `project.yaml` sits over the boards.  `make verify AGNI=agni` also reads every board and job
+and fails on one that reads as no components.  `make test` checks those checks.  CI runs both.
+
 ## Using these from the engine
 
 The engine fetches a **pinned release tarball**, verified by checksum, into a gitignored directory.
@@ -37,8 +62,8 @@ Tarballs are built per purpose, so a job downloads only what it needs:
 | `odb-altium` | ODB++ jobs Altium Designer wrote (the foxBMS boards), byte-identical to their publisher's |
 | `odb-kicad` | each board above exported to ODB++ by kicad-cli, for reading a board both ways |
 
-`make dist` builds them all and writes `SHA256SUMS`.  `make list` prints the lines to pin.  `make verify`
-checks a built set against its sums.
+`make dist` builds them all and writes `SHA256SUMS`.  `make list` prints the lines to pin.  `make
+verify-dist` checks a built set against its sums.
 
 Released artifacts are the pinned ones.  Verify a download against the `SHA256SUMS` attached to the
 release rather than against a local rebuild, since archive metadata varies between machines.
@@ -53,7 +78,11 @@ release rather than against a local rebuild, since archive metadata varies betwe
 3. Drop editor state and renders (`.kicad_prl`, `.lck`, `img/`).  Keep symbol and footprint libraries,
    since resolving them is under test.
 4. Add a section to `PROVENANCE.md`: upstream, source, licence, date taken, and any modification.
-5. Add it to a tarball target in the `Makefile` if a test needs it.
+5. Add a `design.yaml` naming its entry and companions (agni's `agni propose <folder>` drafts one).
+   It is served on the next `make serve`.  Don't add a `project.yaml` above it: a design under a
+   `project.yaml` that it does not `extends` fails to load.
+6. Run `make verify AGNI=agni`.
+7. Add it to a tarball target in the `Makefile` if a test needs it.
 
 ## Licence
 
