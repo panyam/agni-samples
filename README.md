@@ -23,6 +23,9 @@ They live in their own repo so that the engine repo stays a single licence and t
 ODB++ jobs sit apart, under `odb/` (see `PROVENANCE.md`): foxBMS's five boards as Altium Designer
 wrote them (CC-BY-4.0), and each KiCad board above as kicad-cli exports it.
 
+Allegro boards sit under `allegro/`: the BeagleBone AI board as BeagleBoard.org published it
+(CC-BY-4.0), beside the extract Allegro wrote from it.
+
 ## Opening them in agni
 
 A checkout is something `agni serve` can open as it stands.  `agni.yaml` at the root mounts `boards/`,
@@ -90,6 +93,7 @@ Tarballs are built per purpose, so a job downloads only what it needs:
 | `oracle-corpus` | every board, schematics and board files |
 | `odb-altium` | ODB++ jobs Altium Designer wrote (the foxBMS boards), byte-identical to their publisher's |
 | `odb-kicad` | each board above exported to ODB++ by kicad-cli, for reading a board both ways |
+| `allegro` | Allegro `.brd` boards, each with an extract Allegro wrote from the same board |
 
 `make dist` builds them all and writes `SHA256SUMS`.  `make list` prints the lines to pin.  `make
 verify-dist` checks a built set against its sums.
