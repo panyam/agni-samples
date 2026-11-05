@@ -4,6 +4,8 @@
 # older than the board, so its designators name different parts. J7 is a two-pin part in the EDIF
 # and the JTAG header on the board. So the board isn't declared as the EDIF's companion, because a
 # cross-probe between them would pair the wrong parts.
+# CLAYR6.DSN and its ten block files are Capture's own design, with the board's designators. The
+# entry moves to it once agni reads a .DSN (panyam/agni#1399).
 name: clay-r6
 title: Clay R6
 entry: CLAYR6.EDF
