@@ -326,7 +326,7 @@ These are designs as Cadence's tools exported them, in formats agni reads today.
 | Licence | CC BY-SA 3.0 US (`cadence/parallella-parasdr/LICENSE`, the repo's own) |
 | Copyright | (c) 2016 Parallella Foundation |
 | Taken | 2026-11-05 |
-| Modifications | **None.**  All three files are byte-identical to upstream. |
+| Modifications | **None.**  Every file is byte-identical to upstream. |
 | Not included | Gerbers, and the repo's four Allegro ODB++ jobs for its other boards |
 | Added | `design.yaml`, agni's descriptor (Apache-2.0) |
 
@@ -343,12 +343,12 @@ agni's 16.6 reader is held to them (panyam/agni#1388).
 | | |
 |---|---|
 | Upstream | Clay, revision 6, by Michael Gubbels |
-| Source | [ah-cog/Clay](https://github.com/ah-cog/Clay), `Circuit/R6_1/CLAYR6.EDF`, `Circuit/R6_1/allegro/CLAYR6.brd` and `Circuit/R6_1/allegro/pstxnet.dat`, commit `31a84237` |
+| Source | [ah-cog/Clay](https://github.com/ah-cog/Clay), `Circuit/R6_1/CLAYR6.EDF`, `Circuit/R6_1/allegro/CLAYR6.brd`, `Circuit/R6_1/allegro/pstxnet.dat`, and `Circuit/R6_1/CLAYR6.DSN` with the ten block `.DSN` files it places, at their upstream paths, commit `31a84237` |
 | Licence | MIT (`cadence/clay-r6/LICENSE`, the repo's own) |
 | Copyright | (c) 2014 Michael Gubbels |
 | Taken | 2026-11-05 |
-| Modifications | **None.**  All three files are byte-identical to upstream. |
-| Not included | the OrCAD `.DSN`, the earlier `pstxnet.dat` revisions, the earlier revisions' boards and Gerbers, and the firmware |
+| Modifications | **None.**  Every file is byte-identical to upstream. |
+| Not included | the `.opj` projects, the `.DBK` backups, the top-level `SOFT_PWR_SW.DSN` that no block names, the earlier `pstxnet.dat` revisions, the earlier revisions' boards and Gerbers, and the firmware |
 | Added | `design.yaml`, agni's descriptor (Apache-2.0) |
 
 EDIF 2.0.0 from OrCAD Capture: `program "cap2edif"`, `dataOrigin "OrCAD Capture"`, SPB 16.60. agni
@@ -367,6 +367,15 @@ netlist Allegro imports, one `NODE_NAME <ref> <pin>` line per pin under each `NE
 gathers on a net named `NC`. Eight are on C2, TP24 and TP25, which the board does not place yet, and
 on the two WiFi nets they join. Four are R9's and U5's buzzer pins, which the netlist moved after the
 board was saved. agni's tests hold the board read to it (panyam/agni#1388).
+
+`CLAYR6.DSN` (added in v0.1.12, SHA-256 `e993006f...dc651`) is the design OrCAD Capture saved, a
+Microsoft compound file. It places ten hierarchical blocks. Each block names its own `.DSN` by a path
+relative to the top file, such as `.\MPU9250\MPU9250.DSN`, and each sits at that path here. One
+block names `.\SOFT_PWR_SW\SOFT_PWR_SW.dsn` in lower case for a file spelled `.DSN`. The top
+file's `Hierarchy` stream holds every block's designators, the ones the board uses. That table is
+what the EDIF lost. agni reads the whole hierarchy from these files and holds it to `pstxnet.dat`
+(panyam/agni#1399). Upstream last changed the top file on 2016-03-16, after the board, and the
+block files on 2016-02-08. The analysis entry is still the EDIF until agni reads a `.DSN`.
 
 ## Reciprocal licences
 

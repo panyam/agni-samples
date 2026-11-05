@@ -233,7 +233,8 @@ $(DIST)/altium-$(VERSION).tar.gz:
 # cadence-exports: designs that Cadence's tools exported in formats agni reads today, byte-identical
 # to their publishers'. The ODB++ jobs from Allegro sit under odb/allegro/, beside odb/altium/. The
 # IPC-2581 and EDIF exports sit under cadence/, each with a design.yaml, beside the 16.6 board and
-# netlist each one is checked against.
+# netlist each one is checked against. Clay R6 also carries Capture's own .DSN files, which agni
+# reads from panyam/agni#1399.
 $(DIST)/cadence-exports-$(VERSION).tar.gz:
 	@mkdir -p $(DIST)
 	find odb/allegro cadence -type f ! -name '._*' | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
