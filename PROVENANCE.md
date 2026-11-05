@@ -312,16 +312,6 @@ three more families to the three above.
 
 `.brd` header `04 15 13 00`.
 
-### Parallella parasdr board (`allegro/parallella-parasdr/`)
-
-| | |
-|---|---|
-| Source | [parallella/parallella-hw](https://github.com/parallella/parallella-hw), `parasdr/src/parasdr_layout.brd`, commit `a6bcdf84` |
-| Licence | CC BY-SA 3.0 US |
-| Paired with | `cadence/parallella-parasdr/parasdr_ipc2581.xml`, and the ODB++X beside it |
-
-`.brd` header `03 15 13 00`. Its ODB++X names Allegro SPB 16.6.
-
 ## Cadence exports (`cadence/`)
 
 These are designs as Cadence's tools exported them, in formats agni reads today. Each has a
@@ -332,38 +322,51 @@ These are designs as Cadence's tools exported them, in formats agni reads today.
 | | |
 |---|---|
 | Upstream | Parallella parasdr, a software-defined radio board from the Parallella project |
-| Source | [parallella/parallella-hw](https://github.com/parallella/parallella-hw), `parasdr/mfg/parasdr_ipc2581.xml` and `parasdr/mfg/parasdr_odb++.xml`, commit `a6bcdf84` |
+| Source | [parallella/parallella-hw](https://github.com/parallella/parallella-hw), `parasdr/mfg/parasdr_ipc2581.xml`, `parasdr/mfg/parasdr_odb++.xml` and `parasdr/src/parasdr_layout.brd`, commit `a6bcdf84` |
 | Licence | CC BY-SA 3.0 US (`cadence/parallella-parasdr/LICENSE`, the repo's own) |
 | Copyright | (c) 2016 Parallella Foundation |
 | Taken | 2026-11-05 |
-| Modifications | **None.**  Both files are byte-identical to upstream. |
-| Not included | the `.brd`, Gerbers, and the repo's four Allegro ODB++ jobs for its other boards |
+| Modifications | **None.**  All three files are byte-identical to upstream. |
+| Not included | Gerbers, and the repo's four Allegro ODB++ jobs for its other boards |
 | Added | `design.yaml`, agni's descriptor (Apache-2.0) |
 
 `parasdr_ipc2581.xml` is IPC-2581 revision B. Its header names `<SoftwarePackage name="Allegro"
 vendor="Cadence">`. agni reads 404 components, 157 nets and 19 layers. `parasdr_odb++.xml` holds the
-same board as ODB++X (ODX). "UNDISCLOSED Allegro SPB16.6" wrote it on 2014-08-22. agni has no ODX
-reader yet, so the descriptor doesn't name it. Once agni can read ODX, each file can check the other
-against the same board.
+same board as ODB++X (ODX). "UNDISCLOSED Allegro SPB16.6" wrote it on 2014-08-22. agni reads it
+(panyam/agni#1372), and its tests hold the two exports to each other. `parasdr_layout.brd` is the board
+both were exported from, `.brd` header `03 15 13 00`, which is Allegro 16.6. It moved here from
+`allegro/parallella-parasdr/` in v0.1.11, so it ships in `cadence-exports` beside its two exports, and
+agni's 16.6 reader is held to them (panyam/agni#1388).
 
 ### Clay R6 (`cadence/clay-r6/`)
 
 | | |
 |---|---|
 | Upstream | Clay, revision 6, by Michael Gubbels |
-| Source | [ah-cog/Clay](https://github.com/ah-cog/Clay), `Circuit/R6_1/CLAYR6.EDF` and `Circuit/R6_1/allegro/CLAYR6.brd`, commit `31a84237` |
+| Source | [ah-cog/Clay](https://github.com/ah-cog/Clay), `Circuit/R6_1/CLAYR6.EDF`, `Circuit/R6_1/allegro/CLAYR6.brd` and `Circuit/R6_1/allegro/pstxnet.dat`, commit `31a84237` |
 | Licence | MIT (`cadence/clay-r6/LICENSE`, the repo's own) |
 | Copyright | (c) 2014 Michael Gubbels |
 | Taken | 2026-11-05 |
-| Modifications | **None.**  Both files are byte-identical to upstream. |
-| Not included | the OrCAD `.DSN`, the earlier revisions' boards and Gerbers, and the firmware |
+| Modifications | **None.**  All three files are byte-identical to upstream. |
+| Not included | the OrCAD `.DSN`, the earlier `pstxnet.dat` revisions, the earlier revisions' boards and Gerbers, and the firmware |
 | Added | `design.yaml`, agni's descriptor (Apache-2.0) |
 
 EDIF 2.0.0 from OrCAD Capture: `program "cap2edif"`, `dataOrigin "OrCAD Capture"`, SPB 16.60. agni
 reads 74 components and 52 nets. `CLAYR6.brd` (added 2026-11-05, SHA-256 `31784808...5f694f`) is the
-same revision's Allegro board, header `03 15 13 00`, which is Allegro 16.6. Its EDIF is its second
-view, so it is the board agni's cross-probe walk runs on for an EDIF design (panyam/agni#1382), once
-agni reads 16.6 (panyam/agni#1355).
+Allegro board, header `03 15 13 00`, which is Allegro 16.6.
+
+The EDIF is not the board's second view. Capture wrote it on 2016-02-08, and `cap2edi.log` upstream
+warns that the hierarchy lost occurrences. It holds only the top page, with each hierarchical block as
+a part, since each block's sheets live in a `.DSN` of their own. Its designators also name other
+parts than the board's do. J7 is a two-pin part in the EDIF and the JTAG header on the board.
+
+`pstxnet.dat` (added in v0.1.11, SHA-256 `1f7f1612...61461`) is the second view. Capture's netlister
+wrote it on 2016-03-06, and upstream committed it with the board in `6ab7c5d2`. It is the expanded
+netlist Allegro imports, one `NODE_NAME <ref> <pin>` line per pin under each `NET_NAME`. 558 of its
+571 pins sit on the same net on the board. Seven are no-connect pins, which Capture gathers on a net
+named `NC`. Six are on C2, TP24 and TP25, which the board does not place yet, and the six pins left
+are R9's and U5's buzzer pins, which the netlist moved after the board was saved. agni's tests hold
+the board read to it (panyam/agni#1388).
 
 ## Reciprocal licences
 

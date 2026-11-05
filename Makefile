@@ -214,7 +214,7 @@ $(DIST)/allegro-$(VERSION).tar.gz:
 	find $(ALLEGRO_EXTRACT_BOARDS) -type f ! -name '._*' | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
 
 # allegro-boards: the other Allegro boards. Three come with other files Allegro wrote beside them
-# (Gerbers and drill, a placement report, the OrCAD schematic). The other three have an export of the
+# (Gerbers and drill, a placement report, the OrCAD schematic). The other two have an ODB++ job of the
 # same board in cadence-exports. A read of each .brd is checked against those files. The boards come
 # to about 100MB unpacked, so they ship apart from allegro. A job that needs only the extract-backed
 # board fetches less.
@@ -223,15 +223,16 @@ $(DIST)/allegro-boards-$(VERSION).tar.gz:
 	find allegro -type f ! -name '._*' $(foreach b,$(ALLEGRO_EXTRACT_BOARDS),! -path '$(b)/*') \
 	  | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
 
-# cadence-exports: designs that Cadence's tools exported in formats agni reads today, byte-identical
-# to their publishers'. The ODB++ jobs from Allegro sit under odb/allegro/, beside odb/altium/. The
 # altium: the foxBMS boards as Altium Designer saved them (.PcbDoc), byte-identical to their
 # publisher's. Each board's ODB++ export is in odb-altium, so agni's .PcbDoc reader is held to it.
 $(DIST)/altium-$(VERSION).tar.gz:
 	@mkdir -p $(DIST)
 	find altium -type f ! -name '._*' | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
 
-# IPC-2581 and EDIF exports sit under cadence/, each with a design.yaml.
+# cadence-exports: designs that Cadence's tools exported in formats agni reads today, byte-identical
+# to their publishers'. The ODB++ jobs from Allegro sit under odb/allegro/, beside odb/altium/. The
+# IPC-2581 and EDIF exports sit under cadence/, each with a design.yaml, beside the 16.6 board and
+# netlist each one is checked against.
 $(DIST)/cadence-exports-$(VERSION).tar.gz:
 	@mkdir -p $(DIST)
 	find odb/allegro cadence -type f ! -name '._*' | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@

@@ -27,7 +27,7 @@ done
 
 # Each Allegro board, Allegro ODB++ job and Cadence export needs the publisher's licence beside it
 # and a PROVENANCE.md heading naming its folder. A Cadence export also needs a design.yaml, since
-# agni reads it as a design. An Allegro board has none, since agni can't read a .brd yet.
+# agni reads it as a design. An Allegro board has none, since agni reads a .brd by its name.
 for d in allegro/*/ odb/allegro/*/ cadence/*/; do
   [ -d "$d" ] || continue
   dir=${d%/}
