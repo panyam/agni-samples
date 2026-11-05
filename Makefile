@@ -29,19 +29,24 @@ TAR_IDS := $(shell tar --version 2>/dev/null | grep -q 'GNU tar' \
              && echo "--owner=0 --group=0 --numeric-owner" \
              || echo "--uid 0 --gid 0 --uname '' --gname ''")
 
-.PHONY: all dist clean list verify verify-dist test serve serve-wasm site odb-kicad-jobs
+.PHONY: all dist clean list verify verify-dist test setup serve serve-wasm site odb-kicad-jobs \
+        check review diff query trace lexicon pinmap intake trial tour
 
 all: dist
 
 # Serving the checkout. AGNI is the agni binary. A release binary carries the viewer. A dev build
 # (`make agni` in an agni checkout) carries none, so name its web/ too:
 #   make serve AGNI=../agni/bin/agni WEB_DIR=../agni/web
-# MCP=1 also serves agni's analysis to an agent at /mcp.
-AGNI     ?= agni
-PORT     ?= 8080
-WEB_DIR  ?=
-SITE_DIR ?= site
-MOUNTS   := --mount boards=boards --mount odb=odb
+# MCP=1 also serves agni's analysis to an agent at /mcp. HOUSE_DIR moves the house mount, a team's
+# own boards (house/README.md), to a folder outside the checkout.
+#
+# Every target names all three mounts, because a --mount replaces agni.yaml's whole table.
+AGNI      ?= agni
+PORT      ?= 8080
+WEB_DIR   ?=
+SITE_DIR  ?= site
+HOUSE_DIR ?= house
+MOUNTS    := --mount boards=boards --mount odb=odb --mount house=$(HOUSE_DIR)
 WEB_FLAG  = $(if $(WEB_DIR),--web-dir $(WEB_DIR))
 SERVE     = $(AGNI) serve $(MOUNTS) --addr 127.0.0.1:$(PORT) $(WEB_FLAG) $(if $(MCP),--mcp)
 
@@ -70,6 +75,92 @@ verify:
 
 test:
 	@AGNI=$(READ_AGNI) hack/verify_test.sh
+
+# Installs the pre-commit hook, which runs the same checks as make verify before every commit.
+setup:
+	git config core.hooksPath hack/hooks
+
+# Analysis. Each target runs one agni command over DESIGN, a public board or a house one:
+#   make check DESIGN=mount://house/my-board
+# Reports go to reports/, which git ignores. They carry every net name and reference designator, so
+# only the intake and trial reports are meant to leave the machine.
+#
+# A target that would need logic beyond one agni command is a missing command or flag in agni, and is
+# filed there rather than scripted here.
+#
+# These take a value from the make command line only, never from the environment. A shell that
+# exports DESIGN for another project's Makefile would otherwise aim every target here at that design.
+DESIGN     = mount://boards/glasgow-revC3
+CHECKLIST  = examples/checklist.yaml
+SET        = examples/queries.yaml
+A          =
+B          =
+FROM       =
+TO         =
+NAME       = $(notdir $(DESIGN))
+REPORTS   := reports
+need       = @test -n "$($(1))" || { echo "$@ needs $(1)=..." >&2; exit 2; }
+
+$(REPORTS):
+	@mkdir -p $@
+
+# The findings as text, and the verdict report as one HTML page.
+check: | $(REPORTS)
+	$(AGNI) check $(MOUNTS) $(DESIGN)
+	$(AGNI) check $(MOUNTS) $(DESIGN) --format html -o $(REPORTS)/$(NAME)-check.html
+
+# A checklist walk. CHECKLIST is a manifest file, or the name of one the design's project declares.
+review: | $(REPORTS)
+	$(AGNI) review $(MOUNTS) $(DESIGN) --checklist $(CHECKLIST)
+	$(AGNI) review $(MOUNTS) $(DESIGN) --checklist $(CHECKLIST) --format html -o $(REPORTS)/$(NAME)-review.html
+
+# Two revisions, or two views of one board. RENAME_APPROX=1 also pairs nets renamed and changed.
+diff:
+	$(call need,A)
+	$(call need,B)
+	$(AGNI) diff $(MOUNTS) $(A) $(B) $(if $(RENAME_APPROX),--rename-approx)
+
+# A query set. SET is a set file, or the name of one in the design's project queries/.
+query:
+	$(AGNI) query $(MOUNTS) $(DESIGN) --set $(SET)
+
+# The series path between two pins, as <ref-des>.<pin>.
+trace:
+	$(call need,FROM)
+	$(call need,TO)
+	$(AGNI) trace $(MOUNTS) $(DESIGN) --from $(FROM) --to $(TO)
+
+# The vocabulary agni reads the design's names with, for the verify-lexicon skill.
+lexicon:
+	$(AGNI) lexicon $(MOUNTS) $(DESIGN)
+
+# A row per pin the design's io_map declares, to sign off against the netlist and the datasheet.
+pinmap: | $(REPORTS)
+	$(AGNI) check $(MOUNTS) $(DESIGN) --verdicts --format csv --table pin_map -o $(REPORTS)/$(NAME)-pins.csv
+
+# The sanitized summary: parts and rail nominals, with no net name or topology in it.
+intake: | $(REPORTS)
+	$(AGNI) intake $(MOUNTS) $(DESIGN) > $(REPORTS)/$(NAME)-intake.md
+	@echo "wrote $(REPORTS)/$(NAME)-intake.md"
+
+# The trial report: counts and timings, with no name from the design in it.
+trial: | $(REPORTS)
+	$(AGNI) trial $(MOUNTS) $(DESIGN) -o $(REPORTS)/$(NAME)-trial.md
+
+# Every target above on Glasgow, so a team sees each output before adding a board. The trace runs
+# from the microcontroller pin that enables port B's I/O supply, through R26, to the regulator's EN.
+# The diff compares Glasgow's schematic with its kicad-cli ODB++ export.
+TOUR := mount://boards/glasgow-revC3
+tour:
+	@echo "== check";   $(MAKE) -s check   DESIGN=$(TOUR)
+	@echo "== review";  $(MAKE) -s review  DESIGN=$(TOUR)
+	@echo "== query";   $(MAKE) -s query   DESIGN=$(TOUR)
+	@echo "== trace";   $(MAKE) -s trace   DESIGN=$(TOUR) FROM=U1.51 TO=U14.3
+	@echo "== diff";    $(MAKE) -s diff    A=$(TOUR) B=mount://odb/kicad/glasgow-revC3.odb.tgz
+	@echo "== lexicon"; $(MAKE) -s lexicon DESIGN=$(TOUR)
+	@echo "== intake";  $(MAKE) -s intake  DESIGN=$(TOUR)
+	@echo "== trial";   $(MAKE) -s trial   DESIGN=$(TOUR)
+	@echo "== pinmap: skipped, since no public board declares an io_map yet"
 
 # tutorial-board: schematics only, no board file. The docsite ladder never reads copper, and the
 # Jetson board file is 81MB, so shipping it here would multiply every tutorial CI run by twenty.

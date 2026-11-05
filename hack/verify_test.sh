@@ -19,7 +19,15 @@ clean_tree() {
   printf 'name: alpha\nentry: alpha.kicad_sch\n' > "$t/boards/alpha/design.yaml"
   printf '# Provenance\n\n## alpha\n\nfrom somewhere\n' > "$t/PROVENANCE.md"
   printf 'mounts:\n  boards: boards\n  odb: odb\n' > "$t/agni.yaml"
+  mkdir -p "$t/house/_template"
+  printf 'house\n' > "$t/house/README.md"
+  printf 'name: house\n' > "$t/house/_template/project.yaml.example"
+  git -C "$t" init -q && git -C "$t" add -A
 }
+
+# Spelled in two halves, so this file names no foreign mount itself and passes the check it tests.
+foreign="mount:""//acme"
+
 
 expect() {
   local want=$1 name=$2 tree=$3 out
@@ -51,6 +59,21 @@ expect fail "a project.yaml at the root" "$t"
 
 t=$work/boards-project; clean_tree "$t"; : > "$t/boards/project.yaml"
 expect fail "a project.yaml under boards/" "$t"
+
+t=$work/house-board; clean_tree "$t"; mkdir -p "$t/house/widget"
+printf 'name: widget\n' > "$t/house/widget/design.yaml"; git -C "$t" add -f house/widget/design.yaml
+expect fail "a tracked file under house/" "$t"
+
+t=$work/house-untracked; clean_tree "$t"; mkdir -p "$t/house/widget"
+printf 'name: widget\n' > "$t/house/widget/design.yaml"
+expect pass "an untracked house board" "$t"
+
+t=$work/foreign-mount; clean_tree "$t"; printf 'see %s/widget\n' "$foreign" > "$t/notes.md"; git -C "$t" add notes.md
+expect fail "a tracked file naming a mount other than boards, odb or house" "$t"
+
+t=$work/known-mounts; clean_tree "$t"
+printf 'mount://boards/alpha mount://odb/x mount://house/y\n' > "$t/notes.md"; git -C "$t" add notes.md
+expect pass "a tracked file naming the three known mounts" "$t"
 
 if [ -n "${AGNI:-}" ]; then
   t=$work/real; clean_tree "$t"; rm -r "$t/boards/alpha"

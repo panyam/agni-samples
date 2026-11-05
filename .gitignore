@@ -1,3 +1,10 @@
 dist/
 .DS_Store
 site/
+
+# A team's own boards and every report written from them stay on this machine. house/ keeps only its
+# README and the template, and make verify fails if anything else under it is tracked.
+house/*
+!house/README.md
+!house/_template/
+reports/

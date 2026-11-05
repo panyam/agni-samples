@@ -27,6 +27,24 @@ for p in project.yaml boards/project.yaml; do
   [ -e "$p" ] && bad "$p would become the project of every board, and no board extends it"
 done
 
+# A team's house boards stay out of this public repo. Only the README and the template are tracked
+# under house/, and no tracked file may name a mount beyond the three agni.yaml declares, since one
+# naming mount://<team-folder> is a house path on its way to being pushed. Both read git's index, so
+# they also see what is staged, which is what the pre-commit hook needs.
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  while IFS= read -r f; do
+    case $f in
+      house/README.md | house/_template/*) ;;
+      *) bad "$f is tracked, and house/ is for boards that stay on this machine (house/README.md)" ;;
+    esac
+  done < <(git ls-files -- house)
+
+  while IFS= read -r hit; do
+    bad "$hit names a mount other than boards, odb or house"
+  done < <(git ls-files -z | xargs -0 grep -IHnoE 'mount://[A-Za-z0-9_.-]+' 2>/dev/null \
+             | grep -vE ':mount://(boards|odb|house)$')
+fi
+
 if [ -n "${AGNI:-}" ]; then
   designs=$(find boards -name design.yaml ! -path '*/._*' -exec dirname {} \; 2>/dev/null | sort)
   jobs=$(find odb -type f \( -name '*.odb.tgz' -o -name '*.odb.zip' \) ! -name '._*' 2>/dev/null | sort)

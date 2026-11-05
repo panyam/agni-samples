@@ -1,0 +1,12 @@
+# A query set for the public boards: `make query DESIGN=... SET=examples/queries.yaml`. A house
+# board's project keeps its own sets under queries/, and SET can name one of those instead.
+title: Power and probing
+queries:
+  - name: Rails
+    description: Every net agni reads as a rail, with how many pins sit on it.
+    query: net.rail(?net), net.pin_count(?net, ?fanout) => ?net, ?fanout
+  - name: Rails with no test point
+    query: net.rail(?net), not net.has_test_point(?net) => ?net
+  - name: Regulator power pins
+    description: The rails each regulator's power pins sit on, input and output alike.
+    query: component.class(?u, "regulator"), pin.net(?u, ?pin, ?net), pin.role(?u, ?pin, "power"), net.rail(?net) => ?u, ?pin, ?net
