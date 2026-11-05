@@ -201,8 +201,15 @@ $(DIST)/odb-kicad-$(VERSION).tar.gz:
 	@mkdir -p $(DIST)
 	find odb/kicad -type f ! -name '._*' | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
 
+# allegro: Allegro board files, byte-identical to their publishers', each beside an extract Allegro
+# wrote from the same board. agni's Allegro reader is held to the extract, so the two ship together.
+$(DIST)/allegro-$(VERSION).tar.gz:
+	@mkdir -p $(DIST)
+	find allegro -type f ! -name '._*' | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
+
 dist: $(DIST)/tutorial-board-$(VERSION).tar.gz $(DIST)/oracle-corpus-$(VERSION).tar.gz \
-      $(DIST)/odb-altium-$(VERSION).tar.gz $(DIST)/odb-kicad-$(VERSION).tar.gz
+      $(DIST)/odb-altium-$(VERSION).tar.gz $(DIST)/odb-kicad-$(VERSION).tar.gz \
+      $(DIST)/allegro-$(VERSION).tar.gz
 	@cd $(DIST) && shasum -a 256 *-$(VERSION).tar.gz > SHA256SUMS
 	@echo
 	@echo "built $(VERSION):"

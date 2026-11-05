@@ -129,6 +129,25 @@ KiCad's exporter never writes: feature groups, through-hole pads, silkscreen tex
 agni reads each board from its `.kicad_pcb` and from its export and requires the two to agree, so
 the source of the export is also its oracle.
 
+## Allegro boards (`allegro/`)
+
+### BeagleBone AI (`allegro/beaglebone-ai/`)
+
+| | |
+|---|---|
+| Upstream | BeagleBone AI, by BeagleBoard.org |
+| Source | [beagleboard/beaglebone-ai](https://github.com/beagleboard/beaglebone-ai), `HW/BeagleBone-AI.brd` and `HW/cds2f_BeagleBone-AI.txt`, commit `819b6268` |
+| Licence | CC-BY-4.0 (`allegro/beaglebone-ai/LICENSE`, the repo's own) |
+| Copyright | (c) 2019 Jason Kridner, Texas Instruments; (c) 2019 Embest Technology Co., Ltd.; (c) 2020 Seeed Technology Co., Ltd |
+| Taken | 2026-11-05 |
+| Modifications | **None.**  Both files are byte-identical to upstream. |
+| Not included | the OrCAD schematic (`.dsn`), the RevA2 board, Gerbers, BOMs and PDFs |
+
+An Allegro 17.2 board: 716 components, 12 copper layers. `cds2f_BeagleBone-AI.txt` is an Allegro
+extract written from this board, as its `J!` header row records. It lists each component's placement,
+each pin's net, name and position, the vias and their nets, and the padstacks per layer, so agni's
+Allegro reader is held to it.
+
 ## Reciprocal licences
 
 A strongly reciprocal licence (CERN-OHL-S, GPL) obliges whoever distributes a MODIFIED design or a
