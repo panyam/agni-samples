@@ -41,7 +41,7 @@ if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
 
   while IFS= read -r hit; do
     bad "$hit names a mount other than boards, odb or house"
-  done < <(git ls-files -z | xargs -0 grep -IHnoE 'mount://[A-Za-z0-9_.-]+' 2>/dev/null \
+  done < <(git ls-files -z | xargs -0 grep -IHnoE 'mount://[A-Za-z0-9][A-Za-z0-9_.-]*' 2>/dev/null \
              | grep -vE ':mount://(boards|odb|house)$')
 fi
 

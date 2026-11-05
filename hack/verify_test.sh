@@ -75,6 +75,10 @@ t=$work/known-mounts; clean_tree "$t"
 printf 'mount://boards/alpha mount://odb/x mount://house/y\n' > "$t/notes.md"; git -C "$t" add notes.md
 expect pass "a tracked file naming the three known mounts" "$t"
 
+t=$work/placeholder-mount; clean_tree "$t"
+printf 'DESIGN=mount://... or mount://<board>\n' > "$t/notes.md"; git -C "$t" add notes.md
+expect pass "a placeholder mount in prose" "$t"
+
 if [ -n "${AGNI:-}" ]; then
   t=$work/real; clean_tree "$t"; rm -r "$t/boards/alpha"
   cp -R "$repo/boards/glasgow-revC3" "$t/boards/"
