@@ -375,7 +375,8 @@ block names `.\SOFT_PWR_SW\SOFT_PWR_SW.dsn` in lower case for a file spelled `.D
 file's `Hierarchy` stream holds every block's designators, the ones the board uses. That table is
 what the EDIF lost. agni reads the whole hierarchy from these files and holds it to `pstxnet.dat`
 (panyam/agni#1399). Upstream last changed the top file on 2016-03-16, after the board, and the
-block files on 2016-02-08. The analysis entry is still the EDIF until agni reads a `.DSN`.
+block files on 2016-02-08. Since v0.1.13 `design.yaml` names `CLAYR6.DSN` as the entry and
+`CLAYR6.brd` as its companion, now that agni reads a `.DSN` (panyam/agni#1405, #1412).
 
 ## Reciprocal licences
 

@@ -1,11 +1,10 @@
-# Added by agni, not part of the upstream design (see PROVENANCE.md). Analysis reads the EDIF netlist
-# that OrCAD Capture wrote. CLAYR6.brd beside it is the Allegro 16.6 board, and pstxnet.dat is the
-# netlist Capture handed Allegro for that board. The EDIF holds only the top page and is a month
-# older than the board, so its designators name different parts. J7 is a two-pin part in the EDIF
-# and the JTAG header on the board. So the board isn't declared as the EDIF's companion, because a
-# cross-probe between them would pair the wrong parts.
-# CLAYR6.DSN and its ten block files are Capture's own design, with the board's designators. The
-# entry moves to it once agni reads a .DSN (panyam/agni#1399).
+# Added by agni, not part of the upstream design (see PROVENANCE.md). Analysis reads CLAYR6.DSN, the
+# design OrCAD Capture saved, and the ten block files it places. CLAYR6.brd is the Allegro 16.6
+# board saved from it, so it is the design's board. pstxnet.dat is the netlist Capture handed
+# Allegro for that board. CLAYR6.EDF is an older EDIF export that holds only the top page, and its
+# designators name other parts than the board's, so nothing reads it as this design.
 name: clay-r6
 title: Clay R6
-entry: CLAYR6.EDF
+entry: CLAYR6.DSN
+companions:
+  - CLAYR6.brd
