@@ -30,7 +30,7 @@ TAR_IDS := $(shell tar --version 2>/dev/null | grep -q 'GNU tar' \
              && echo "--owner=0 --group=0 --numeric-owner" \
              || echo "--uid 0 --gid 0 --uname '' --gname ''")
 
-.PHONY: all dist clean list verify verify-dist test setup serve serve-wasm site odb-kicad-jobs \
+.PHONY: all dist clean list verify verify-dist test setup serve serve-wasm site odb-kicad-jobs remote remote-clean \
         check review diff query trace lexicon pinmap intake trial tour
 
 all: dist
@@ -41,14 +41,14 @@ all: dist
 # MCP=1 also serves agni's analysis to an agent at /mcp. The house mount holds a team's own boards
 # (house/README.md), and HOUSE_DIR moves it to a folder outside the checkout.
 #
-# Every target names all six mounts, because a --mount replaces agni.yaml's whole table.
+# Every target names all seven mounts, because a --mount replaces agni.yaml's whole table.
 AGNI      ?= agni
 PORT      ?= 8080
 WEB_DIR   ?=
 SITE_DIR  ?= site
 HOUSE_DIR ?= house
 MOUNTS    := --mount boards=boards --mount odb=odb --mount cadence=cadence --mount allegro=allegro --mount altium=altium \
-             --mount house=$(HOUSE_DIR)
+             --mount remote=remote --mount house=$(HOUSE_DIR)
 WEB_FLAG  = $(if $(WEB_DIR),--web-dir $(WEB_DIR))
 SERVE     = $(AGNI) serve $(MOUNTS) --addr 127.0.0.1:$(PORT) $(WEB_FLAG) $(if $(MCP),--mcp)
 
@@ -73,11 +73,21 @@ site:
 # the same way.
 READ_AGNI = $(if $(filter command% environment%,$(origin AGNI)),$(AGNI))
 
+# The boards remote/remote.pin names, fetched from their publishers' repos into remote/ through a
+# cache in ~/.cache/agni/samples, so each is downloaded once per machine. remote-clean lists cache
+# files unused for 30 days and deletes them only when you answer y.
+remote:
+	@hack/fetch_remote.sh
+
+remote-clean:
+	@hack/clean_remote.sh
+
 verify:
 	@AGNI=$(READ_AGNI) HOUSE_DIR=$(HOUSE_DIR) hack/verify.sh
 
 test:
 	@AGNI=$(READ_AGNI) hack/verify_test.sh
+	@hack/fetch_remote_test.sh
 
 # Installs the pre-commit hook, which runs the same checks as make verify before every commit.
 setup:
@@ -230,6 +240,13 @@ $(DIST)/altium-$(VERSION).tar.gz:
 	@mkdir -p $(DIST)
 	find altium -type f ! -name '._*' | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
 
+# remote-boards: where to fetch the boards this repo may not redistribute, and nothing else. It holds
+# remote/remote.pin, the URLs at fixed commits and their sha256. The engine fetches each board from
+# its publisher through hack/fetch_remote.sh's cache (PROVENANCE.md, "Boards fetched from upstream").
+$(DIST)/remote-boards-$(VERSION).tar.gz:
+	@mkdir -p $(DIST)
+	git ls-files remote | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
+
 # cadence-exports: designs that Cadence's tools exported in formats agni reads today, byte-identical
 # to their publishers'. The ODB++ jobs from Allegro sit under odb/allegro/, beside odb/altium/. The
 # IPC-2581 and EDIF exports sit under cadence/, each with a design.yaml, beside the 16.6 board and
@@ -242,7 +259,8 @@ $(DIST)/cadence-exports-$(VERSION).tar.gz:
 dist: $(DIST)/tutorial-board-$(VERSION).tar.gz $(DIST)/oracle-corpus-$(VERSION).tar.gz \
       $(DIST)/odb-altium-$(VERSION).tar.gz $(DIST)/odb-kicad-$(VERSION).tar.gz \
       $(DIST)/allegro-$(VERSION).tar.gz $(DIST)/allegro-boards-$(VERSION).tar.gz \
-      $(DIST)/cadence-exports-$(VERSION).tar.gz $(DIST)/altium-$(VERSION).tar.gz
+      $(DIST)/cadence-exports-$(VERSION).tar.gz $(DIST)/altium-$(VERSION).tar.gz \
+      $(DIST)/remote-boards-$(VERSION).tar.gz
 	@cd $(DIST) && shasum -a 256 *-$(VERSION).tar.gz > SHA256SUMS
 	@echo
 	@echo "built $(VERSION):"

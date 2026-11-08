@@ -1,0 +1,16 @@
+# Boards fetched from their publishers' own repos rather than shipped here, because their repos
+# state no licence that grants redistribution (PROVENANCE.md, "Boards fetched from upstream").
+# `make remote` runs hack/fetch_remote.sh, which reads this file.
+#
+# <sha256>  <board>  <url at a fixed commit>  [unzip]
+
+# BeagleBoard-X15 rev B1, Allegro 16.6, with its Gerbers.
+fc65451876f3073502fad74ac7c5e918f472bf60401b155092d640dcec21f97a  beagleboard-x15  https://raw.githubusercontent.com/beagleboard/beagleboard-x15/0e2a7d171ba05c14010a29bd4eaeb9ae3ccf18e3/BEAGLEBOARD_X15_REVB1_CAD.zip  unzip
+36464fc972c482d914091bfb3a237415f922343b86cc8d0062841eaa63b8842f  beagleboard-x15  https://raw.githubusercontent.com/beagleboard/beagleboard-x15/0e2a7d171ba05c14010a29bd4eaeb9ae3ccf18e3/BEAGLEBOARD_X15_Gerbers.zip  unzip
+
+# BeagleBone rev C2, Allegro 16.4, with its Allegro extract, ODB++ job and IPC-356 netlist.
+bd2be6e408fdb7508024e72fc64eb76468e21ed93c563a50ec1ef6084c7728dd  beaglebone-revc2  https://raw.githubusercontent.com/beagleboard/BeagleBone/83e5236753566a8b1bb67acfc292ce9dea67754a/BEAGLEBONE_REVC2_PCB.zip  unzip
+247d4e749ef7ae41d51b87eaed5112e0b3c3824962ac293c327fbc2c69eac00c  beaglebone-revc2  https://raw.githubusercontent.com/beagleboard/BeagleBone/83e5236753566a8b1bb67acfc292ce9dea67754a/BEAGLEBONE_REVC2_MFG.zip  unzip
+
+# BeagleBone Black rev B4, Allegro 16.4, with its manufacturing files.
+cef7602056b2984893122daf6bfe68625ffa2f5e70b13f804d3a8b2aee96ada9  beaglebone-black-revb4  https://raw.githubusercontent.com/beagleboard/BeagleBone-Black-RevA5C/912f7f1682e81901b24aa550a0025798cd8e33f1/BBB_PCB.zip  unzip

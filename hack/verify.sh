@@ -36,6 +36,24 @@ for d in allegro/*/ odb/allegro/*/ cadence/*/; do
   case $dir in cadence/*) [ -f "$dir/design.yaml" ] || bad "$dir has no design.yaml" ;; esac
 done
 
+# A board fetched from upstream has no LICENSE to ship, since none grants redistribution. It needs a
+# line in remote/remote.pin and a PROVENANCE.md heading naming its folder, which says so. Its files
+# must never be tracked, and .gitignore keeps them out. This checks the index too, so a forced add
+# fails before it is pushed.
+pinned=
+if [ -f remote/remote.pin ]; then
+  pinned=$(awk '$1 !~ /^#/ && NF >= 3 {print $2}' remote/remote.pin | sort -u)
+  [ -n "$pinned" ] || bad "remote/remote.pin names no boards"
+fi
+for b in $pinned; do
+  grep -qE "^#+ .*\(\`remote/$b/\`\)" PROVENANCE.md 2>/dev/null || bad "remote/$b has no PROVENANCE.md heading naming (\`remote/$b/\`)"
+done
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  while IFS= read -r f; do
+    [ "$f" = remote/remote.pin ] || bad "$f is tracked, and remote/ boards are fetched, never shipped (remote/remote.pin)"
+  done < <(git ls-files -- remote)
+fi
+
 for p in project.yaml boards/project.yaml; do
   [ -e "$p" ] && bad "$p would become the project of every board, and no board extends it"
 done
@@ -53,17 +71,17 @@ if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   done < <(git ls-files -- house)
 
   while IFS= read -r hit; do
-    bad "$hit names a mount other than boards, odb, cadence, allegro, altium or house"
+    bad "$hit names a mount other than boards, odb, cadence, allegro, altium, remote or house"
   done < <(git ls-files -z | xargs -0 grep -IHnoE 'mount://[A-Za-z0-9][A-Za-z0-9_.-]*' 2>/dev/null \
-             | grep -vE ':mount://(boards|odb|cadence|allegro|altium|house)$')
+             | grep -vE ':mount://(boards|odb|cadence|allegro|altium|remote|house)$')
 fi
 
 if [ -n "${AGNI:-}" ]; then
   # house/ is read too, so a team's own boards get the same check. When HOUSE_DIR moves it, every
-  # read names all six mounts, because one --mount replaces agni.yaml's whole table.
+  # read names all seven mounts, because one --mount replaces agni.yaml's whole table.
   house=${HOUSE_DIR:-house}
   mounts=()
-  [ "$house" = house ] || mounts=(--mount boards=boards --mount odb=odb --mount cadence=cadence --mount allegro=allegro --mount altium=altium --mount "house=$house")
+  [ "$house" = house ] || mounts=(--mount boards=boards --mount odb=odb --mount cadence=cadence --mount allegro=allegro --mount altium=altium --mount remote=remote --mount "house=$house")
   designs=$(find boards cadence -name design.yaml ! -path '*/._*' -exec dirname {} \; 2>/dev/null | sort)
   house_designs=$(find "$house" -name design.yaml ! -path '*/._*' ! -path '*/_template/*' -exec dirname {} \; 2>/dev/null | sort)
   jobs=$(find odb -type f \( -name '*.odb.tgz' -o -name '*.odb.zip' \) ! -name '._*' 2>/dev/null | sort)
@@ -74,7 +92,11 @@ if [ -n "${AGNI:-}" ]; then
             find allegro -name '*.brd' ! -name '._*' ! -path 'allegro/pc069/*' ! -path 'allegro/beagleplay/*' \
               ! -path 'allegro/beaglev-fire/*' ! -path 'allegro/slugs-v2/*' ! -path 'allegro/parallella/*' \
               ! -path 'allegro/adalm1000/*' 2>/dev/null)
-  natives=$(printf '%s\n' "$natives" | sort)
+  # A fetched board is read when it has been fetched (make remote). The two BeagleBone boards are
+  # Allegro 16.4, which agni does not read yet (agni issue 1355).
+  natives="$natives
+$(find remote -name '*.brd' ! -name '._*' ! -path 'remote/beaglebone-revc2/*' ! -path 'remote/beaglebone-black-revb4/*' 2>/dev/null)"
+  natives=$(printf '%s\n' "$natives" | sed '/^$/d' | sort)
   uris=$(for p in $designs $jobs $natives; do echo "mount://$p"; done
          for p in $house_designs; do echo "mount://house/${p#"$house"/}"; done)
   for uri in $uris; do
