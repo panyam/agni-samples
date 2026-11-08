@@ -29,6 +29,13 @@ jobs:
           gh release download "$AGNI_VERSION" -R panyam/agni -p "agni_${AGNI_VERSION}_linux_amd64.tar.gz" -D "$RUNNER_TEMP"
           tar -xzf "$RUNNER_TEMP/agni_${AGNI_VERSION}_linux_amd64.tar.gz" -C "$RUNNER_TEMP"
           echo "AGNI=$(find "$RUNNER_TEMP" -type f -name agni)" >> "$GITHUB_ENV"
+      # The boards remote/remote.pin fetches from their publishers, kept between runs by the pin's
+      # hash, so a run downloads them only when the pin changes.
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/agni/samples
+          key: remote-boards-${{ hashFiles('remote/remote.pin') }}
+      - run: make remote
       - run: make verify AGNI="$AGNI"
       - run: make test AGNI="$AGNI"
       # Every analysis target on Glasgow, so a target whose agni flags change fails here first.

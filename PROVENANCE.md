@@ -453,6 +453,53 @@ what the EDIF lost. agni reads the whole hierarchy from these files and holds it
 block files on 2016-02-08. Since v0.1.13 `design.yaml` names `CLAYR6.DSN` as the entry and
 `CLAYR6.brd` as its companion, now that agni reads a `.DSN` (panyam/agni#1405, #1412).
 
+## Boards fetched from upstream (`remote/`)
+
+These boards' repos carry no LICENSE file, so nothing grants this repo the right to redistribute
+them, and it does not. `remote/remote.pin` names each file by its URL at a fixed commit and its
+sha256, and `make remote` (hack/fetch_remote.sh) downloads it from the publisher into a local cache,
+then into `remote/<board>/`. No file under `remote/` but the pin is ever committed, and `make verify`
+fails if one is. Should a publisher add a licence, the board moves into a shipped folder.
+
+BeagleBoard.org publishes these designs openly, and OSHWA certified the BeagleBone Black
+(US000236, documentation CC BY-SA). Each SRM licenses the manual under CC BY-SA 3.0, which covers
+the document, not the design files.
+
+### BeagleBoard-X15 rev B1 (`remote/beagleboard-x15/`)
+
+| | |
+|---|---|
+| Upstream | BeagleBoard-X15, by BeagleBoard.org |
+| Source | [beagleboard/beagleboard-x15](https://github.com/beagleboard/beagleboard-x15), `BEAGLEBOARD_X15_REVB1_CAD.zip` and `BEAGLEBOARD_X15_Gerbers.zip`, commit `0e2a7d17` |
+| Licence | none stated in the repo |
+| Fetched | the board `BB_X15_revB1_public.brd` and the Gerbers, drill and logs in `X15_Gerbers/` |
+
+`.brd` header `04 15 13 00`, Allegro 16.6. agni reads 1094 components and 855 nets, and the board
+declares 46 differential pairs and 8 match groups.
+
+### BeagleBone rev C2 (`remote/beaglebone-revc2/`)
+
+| | |
+|---|---|
+| Upstream | BeagleBone (the original white board), by BeagleBoard.org |
+| Source | [beagleboard/BeagleBone](https://github.com/beagleboard/BeagleBone), `BEAGLEBONE_REVC2_PCB.zip` and `BEAGLEBONE_REVC2_MFG.zip`, commit `83e52367` |
+| Licence | none stated in the repo |
+| Fetched | `BEAGLEBONE_REVC2.brd`, and the manufacturing package with its zips unpacked: the Allegro extract, the ODB++ job, the IPC-356A netlist, Gerbers, drill, a CircuitCAM export and the placement spreadsheet |
+
+`.brd` header `03 0c 13 00`, Allegro 16.4, which agni does not read yet (panyam/agni#1355). The
+extract, ODB++ job and netlist are this board's second views.
+
+### BeagleBone Black rev B4 (`remote/beaglebone-black-revb4/`)
+
+| | |
+|---|---|
+| Upstream | BeagleBone Black, by BeagleBoard.org |
+| Source | [beagleboard/BeagleBone-Black-RevA5C](https://github.com/beagleboard/BeagleBone-Black-RevA5C), `BBB_PCB.zip`, commit `912f7f16` |
+| Licence | none stated in the repo |
+| Fetched | `BeagleBone_Black_RevB4_NOLOGO.brd` and the manufacturing package: IPC-356A netlist, CDC2FAB export, Gerbers and drill |
+
+`.brd` header `03 0c 13 00`, Allegro 16.4.
+
 ## Reciprocal licences
 
 Suppose someone distributes a MODIFIED design under a strongly reciprocal licence (CERN-OHL-S, GPL),
@@ -472,7 +519,6 @@ These designs were considered and left out.  They're recorded here so nobody rep
 | `stickhub` | CC BY-NC-SA, NonCommercial |
 | `openair-max` | CC BY-SA, left out as reciprocal before "Reciprocal licences" above reversed that rule |
 | Framework Laptop expansion cards | CC-BY-4.0 and fine to ship, but KiCad 5 format, which agni does not read |
-| BeagleBone RevC2, BeagleBone Black RevB4, BeagleBoard-X15 | no LICENSE file in their repos, so nothing grants redistribution. panyam/agni#1446 would fetch them from upstream instead |
 | LimeSDR-USB 1v4 (ASCII and binary `.PcbDoc`) | CC-BY 3.0 and fine to ship, left out for size (64MB). The OpenSpeechPlatform pairs cover the same case |
 
 If a test needs one of these, it should read it from a local KiCad installation. When the file is

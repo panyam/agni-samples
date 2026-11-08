@@ -8,3 +8,8 @@ house/*
 !house/README.md
 !house/_template/
 reports/
+
+# Boards fetched from their publishers' own repos (remote/remote.pin) are never committed, since
+# nothing grants this repo the right to redistribute them. Only the pin file is tracked.
+remote/*
+!remote/remote.pin

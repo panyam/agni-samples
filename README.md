@@ -44,10 +44,18 @@ its publisher released beside it.
 files.  Two OpenSpeechPlatform boards (BSD-2-Clause) come as a binary `.PcbDoc` and the ASCII
 `.PcbDoc` Altium saved of the same board, with their Gerbers.
 
+`remote/` holds boards this repo may not redistribute, because their repos state no licence.  Only
+`remote/remote.pin` is committed.  It names each file by its URL at a fixed commit and its sha256.
+`make remote` downloads them from their publishers into a cache in `~/.cache/agni/samples`, so each
+is downloaded once per machine, and copies them into `remote/<board>/`.  Three BeagleBoard.org
+boards come this way: the BeagleBoard-X15 (Allegro 16.6), and the BeagleBone rev C2 and BeagleBone
+Black rev B4 (16.4).  `make remote-clean` lists cache files unused for 30 days, and deletes them only
+when you answer y.
+
 ## Opening them in agni
 
 `agni serve` can open a checkout as it stands.  `agni.yaml` at the root mounts `boards/`, `odb/`,
-`cadence/`, `allegro/`, `altium/` and `house/`, so `agni check mount://boards/hackrf-one` works at the
+`cadence/`, `allegro/`, `altium/`, `remote/` and `house/`, so `agni check mount://boards/hackrf-one` works at the
 root with no flags.
 Run it from the root.  agni finds `agni.yaml` from a subfolder too, but then reads its paths against
 the folder you're in.  You need agni v0.6.0 or later, the first release that reads OrCAD Capture
@@ -57,6 +65,7 @@ Parallella-I and the ADALM1000 were saved by releases agni does not read yet (ag
 agni does not read an ASCII `.PcbDoc` yet (agni issue 1393).
 
 ```bash
+make remote       # fetch the remote/ boards first, if you want them in the viewer
 make serve        # the viewer over every board, job, native board and house board, at http://127.0.0.1:8080/
 make serve-wasm   # the same, with each design analysed in your browser
 make site         # the whole set as static files in site/, the way agni's public demo is built
@@ -124,6 +133,7 @@ Tarballs are built per purpose, so a job downloads only what it needs:
 | `odb-kicad` | each board above exported to ODB++ by kicad-cli, for reading a board both ways |
 | `allegro` | the BeagleBone AI's Allegro `.brd`, with the extract Allegro wrote from the same board |
 | `cadence-exports` | ODB++ jobs Allegro's tools wrote (`odb/allegro/`), and the IPC-2581 and EDIF exports under `cadence/` |
+| `remote-boards` | `remote/remote.pin` alone, from which the engine fetches the `remote/` boards from their publishers |
 | `allegro-boards` | nine more Allegro `.brd` boards: six with the Gerbers, drill files, netlists, placement reports and OrCAD schematics their publishers released beside them, and three whose export is in `cadence-exports` |
 
 `make dist` builds them all and writes `SHA256SUMS`.  `make list` prints the lines to pin.  `make

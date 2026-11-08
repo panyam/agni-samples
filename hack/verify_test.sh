@@ -55,6 +55,27 @@ expect fail "a board with no PROVENANCE.md section" "$t"
 t=$work/prefix-provenance; clean_tree "$t"; printf '# Provenance\n\n## alpha-two\n' > "$t/PROVENANCE.md"
 expect fail "a PROVENANCE.md section for a different board sharing the prefix" "$t"
 
+remote_tree() {
+  clean_tree "$1"
+  mkdir -p "$1/remote"
+  printf '%s  gadget  https://example.invalid/gadget.zip  unzip\n' "$(printf 'a%.0s' {1..64})" > "$1/remote/remote.pin"
+  printf '\n### Gadget (`remote/gadget/`)\n\nno licence stated\n' >> "$1/PROVENANCE.md"
+  git -C "$1" add -A
+}
+
+t=$work/remote; remote_tree "$t"
+expect pass "a pinned remote board with its PROVENANCE.md heading" "$t"
+
+t=$work/remote-no-provenance; remote_tree "$t"; printf '# Provenance\n\n## alpha\n' > "$t/PROVENANCE.md"
+expect fail "a pinned remote board with no PROVENANCE.md heading" "$t"
+
+t=$work/remote-tracked; remote_tree "$t"; mkdir -p "$t/remote/gadget"; : > "$t/remote/gadget/gadget.brd"
+git -C "$t" add -f remote/gadget/gadget.brd
+expect fail "a fetched remote board that is tracked" "$t"
+
+t=$work/remote-empty-pin; remote_tree "$t"; printf '# nothing pinned\n' > "$t/remote/remote.pin"
+expect fail "a remote.pin that names no boards" "$t"
+
 t=$work/root-project; clean_tree "$t"; : > "$t/project.yaml"
 expect fail "a project.yaml at the root" "$t"
 

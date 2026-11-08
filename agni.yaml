@@ -9,4 +9,5 @@ mounts:
   cadence: cadence
   allegro: allegro
   altium: altium
+  remote: remote
   house: house
