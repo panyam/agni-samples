@@ -67,11 +67,13 @@ if [ -n "${AGNI:-}" ]; then
   designs=$(find boards cadence -name design.yaml ! -path '*/._*' -exec dirname {} \; 2>/dev/null | sort)
   house_designs=$(find "$house" -name design.yaml ! -path '*/._*' ! -path '*/_template/*' -exec dirname {} \; 2>/dev/null | sort)
   jobs=$(find odb -type f \( -name '*.odb.tgz' -o -name '*.odb.zip' \) ! -name '._*' 2>/dev/null | sort)
-  # A native board is read by its own name. pc069, BeaglePlay and BeagleV-Fire were saved by Allegro
-  # releases agni does not read yet (agni issue 1355), so they are left out until it does.
-  natives=$(find altium -name '*.PcbDoc' ! -name '._*' 2>/dev/null
+  # A native board is read by its own name. pc069, BeaglePlay, BeagleV-Fire, SLUGS v2, Parallella-I
+  # and the ADALM1000 were saved by Allegro releases agni does not read yet (agni issue 1355), and
+  # agni reads no ASCII .PcbDoc yet (agni issue 1393), so they are left out until it does.
+  natives=$(find altium -name '*.PcbDoc' ! -name '._*' ! -path 'altium/osp-*/Outputs/*' 2>/dev/null
             find allegro -name '*.brd' ! -name '._*' ! -path 'allegro/pc069/*' ! -path 'allegro/beagleplay/*' \
-              ! -path 'allegro/beaglev-fire/*' 2>/dev/null)
+              ! -path 'allegro/beaglev-fire/*' ! -path 'allegro/slugs-v2/*' ! -path 'allegro/parallella/*' \
+              ! -path 'allegro/adalm1000/*' 2>/dev/null)
   natives=$(printf '%s\n' "$natives" | sort)
   uris=$(for p in $designs $jobs $natives; do echo "mount://$p"; done
          for p in $house_designs; do echo "mount://house/${p#"$house"/}"; done)
