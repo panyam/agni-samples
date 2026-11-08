@@ -214,11 +214,11 @@ $(DIST)/allegro-$(VERSION).tar.gz:
 	@mkdir -p $(DIST)
 	find $(ALLEGRO_EXTRACT_BOARDS) -type f ! -name '._*' | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
 
-# allegro-boards: the other Allegro boards. Three come with other files Allegro wrote beside them
-# (Gerbers and drill, a placement report, the OrCAD schematic). The other two have an ODB++ job of the
-# same board in cadence-exports. A read of each .brd is checked against those files. The boards come
-# to about 100MB unpacked, so they ship apart from allegro. A job that needs only the extract-backed
-# board fetches less.
+# allegro-boards: the other Allegro boards. Six come with other files their publishers released
+# beside them (Gerbers and drill, a netlist, a placement report, the OrCAD schematic). The other three
+# have an ODB++ job of the same board in cadence-exports. A read of each .brd is checked against
+# those files. The boards come to about 125MB unpacked, so they ship apart from allegro. A job that
+# needs only the extract-backed board fetches less.
 $(DIST)/allegro-boards-$(VERSION).tar.gz:
 	@mkdir -p $(DIST)
 	find allegro -type f ! -name '._*' $(foreach b,$(ALLEGRO_EXTRACT_BOARDS),! -path '$(b)/*') \

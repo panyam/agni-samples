@@ -36,7 +36,13 @@ BeagleV-Fire and BeagleBone AI-64 come with other files Allegro wrote beside eac
 Gerbers and drill files, or a placement report.  BeagleBoard's Allegro boards use three `.brd`
 header families, and these four cover all three.  The other two `.brd` boards are pc069 and the
 OpenCellular breakout.  Each publisher also released an ODB++ job of the same board, under
-`odb/allegro/`.
+`odb/allegro/`.  SLUGS v2 (MIT, Allegro 16.0), Parallella-I (CC BY-SA 3.0 US, 16.4) and the
+ADALM1000 (CC BY-SA 3.0, 16.5) come from earlier releases, each with the netlist, films or exports
+its publisher released beside it.
+
+`altium/` holds Altium boards as Altium saved them.  The five foxBMS boards are binary `.PcbDoc`
+files.  Two OpenSpeechPlatform boards (BSD-2-Clause) come as a binary `.PcbDoc` and the ASCII
+`.PcbDoc` Altium saved of the same board, with their Gerbers.
 
 ## Opening them in agni
 
@@ -45,9 +51,10 @@ OpenCellular breakout.  Each publisher also released an ODB++ job of the same bo
 root with no flags.
 Run it from the root.  agni finds `agni.yaml` from a subfolder too, but then reads its paths against
 the folder you're in.  You need agni v0.6.0 or later, the first release that reads OrCAD Capture
-designs, which Clay R6 is read from.  It opens all five `.PcbDoc` boards and five of the eight Allegro `.brd` boards,
-counting the two under `cadence/`.  BeaglePlay (Allegro 17.4), BeagleV-Fire (17.5) and pc069 were
-saved by releases agni does not read yet (agni issue 1355).
+designs, which Clay R6 is read from.  It opens the seven binary `.PcbDoc` boards and five of the eleven Allegro `.brd` boards,
+counting the two under `cadence/`.  BeaglePlay (Allegro 17.4), BeagleV-Fire (17.5), pc069, SLUGS v2,
+Parallella-I and the ADALM1000 were saved by releases agni does not read yet (agni issue 1355), and
+agni does not read an ASCII `.PcbDoc` yet (agni issue 1393).
 
 ```bash
 make serve        # the viewer over every board, job, native board and house board, at http://127.0.0.1:8080/
@@ -113,11 +120,11 @@ Tarballs are built per purpose, so a job downloads only what it needs:
 | `tutorial-board` | the Jetson baseboard, schematics only |
 | `oracle-corpus` | every board, schematics and board files |
 | `odb-altium` | ODB++ jobs Altium Designer wrote (the foxBMS boards), byte-identical to their publisher's |
-| `altium` | the same foxBMS boards as Altium saved them (`.PcbDoc`), each held to its ODB++ export in `odb-altium` |
+| `altium` | the same foxBMS boards as Altium saved them (`.PcbDoc`), each held to its ODB++ export in `odb-altium`, and two OpenSpeechPlatform boards saved both as binary and as ASCII `.PcbDoc` |
 | `odb-kicad` | each board above exported to ODB++ by kicad-cli, for reading a board both ways |
 | `allegro` | the BeagleBone AI's Allegro `.brd`, with the extract Allegro wrote from the same board |
 | `cadence-exports` | ODB++ jobs Allegro's tools wrote (`odb/allegro/`), and the IPC-2581 and EDIF exports under `cadence/` |
-| `allegro-boards` | six more Allegro `.brd` boards: three with the Gerbers, drill files, placement report and OrCAD schematics Allegro and OrCAD wrote beside them, and three whose export is in `cadence-exports` |
+| `allegro-boards` | nine more Allegro `.brd` boards: six with the Gerbers, drill files, netlists, placement reports and OrCAD schematics their publishers released beside them, and three whose export is in `cadence-exports` |
 
 `make dist` builds them all and writes `SHA256SUMS`.  `make list` prints the lines to pin.  `make
 verify-dist` checks a built set against its sums.

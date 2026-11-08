@@ -135,6 +135,24 @@ holds its `.PcbDoc` and its ODB++ job side by side, and the job is byte-identica
 `odb-altium`. So agni's `.PcbDoc` reader is held to Altium's own export of the same board
 (panyam/agni#1349).
 
+### OpenSpeechPlatform boards, ASCII and binary (`altium/osp-carrier-v8/`, `altium/osp-djb-v2-rigid/`)
+
+| | |
+|---|---|
+| Upstream | the Open Speech Platform carrier (V8) and DJB v2 rigid boards, by UC San Diego |
+| Source | [nihospr01/OpenSpeechPlatform-2020B](https://github.com/nihospr01/OpenSpeechPlatform-2020B), `Hardware/Carrier (PCD)/OSP_Carrier_V8/` and `Hardware/DJB (Digital BTE-RIC)/djb_v2/djb_v2_rigid/`, commit `592fd4da` |
+| Licence | BSD-2-Clause (each folder's `LICENSE`, the repo's own) |
+| Copyright | (c) 2018 Regents of the University of California |
+| Taken | 2026-11-08 |
+| Files | each board's binary `.PcbDoc`, the ASCII `.PcbDoc` Altium saved of it under `Outputs/Assembly/`, and the Gerbers, drill and reports in `Outputs/Fabrication/` |
+| Modifications | **None.** Every file is byte-identical to upstream, checked against its git blob hash. |
+| Not included | the schematics, project files, BOM and placement spreadsheets, and PDFs |
+
+Altium saves a `.PcbDoc` in either form. The binary one is a compound file, and the ASCII one holds
+one `|RECORD=...|` property list per line. Each pair is one board, so agni's ASCII read can be held to
+its binary read (panyam/agni#1393). The carrier holds 182 components and 144 nets, and the DJB 72
+and 47.
+
 ### KiCad boards, exported by kicad-cli (`odb/kicad/`)
 
 | | |
@@ -312,6 +330,63 @@ three more families to the three above.
 
 `.brd` header `04 15 13 00`.
 
+### Boards from earlier Allegro releases
+
+These three boards were saved by Allegro releases older than 16.6, and agni does not read them yet
+(panyam/agni#1355). Each ships with other files its publisher released beside it, so a read can be
+held to them once it exists. Every file is byte-identical to upstream, checked against its git blob
+hash, and keeps its upstream path under the board's folder.
+
+### SLUGS v2 autopilot (`allegro/slugs-v2/`)
+
+| | |
+|---|---|
+| Upstream | SLUGS v2, by the UCSC Autonomous Systems Lab |
+| Source | [gottlieb/SLUGS](https://github.com/gottlieb/SLUGS), `hardware/full_slugs2_and_2_1_with_all_library_pads/SLUGS_V2/`, commit `f812d3ce` |
+| Licence | MIT (`allegro/slugs-v2/LICENSE`, the repo's own) |
+| Copyright | (c) 2009 UCSC Autonomous Systems Lab |
+| Taken | 2026-11-08 |
+| Files | `allegro/slugs_v2.brd`, Capture's netlist for it (`pstxnet.dat`, `pstchip.dat`, `pstxprt.dat`), the schematic `SLUGS_V2.DSN`, the copper, mask and silk films and drill file in `allegro/board_files/`, `photoplot.log`, `art_param.txt`, `nc_param.txt`, and the differential-pair rule script `slugs_v2_diffpair.do` |
+| Modifications | **None.** |
+| Not included | the SLUGS 2.1 board beside it, Allegro's numbered backups (`,1`), the padstack and symbol libraries, logs and the films in `board_files/gerber_exported/` |
+
+`.brd` header `00 02 13 00`. `photoplot.log` records Allegro 16.0p002, so that header comes from 16.0.
+
+### Parallella-I revD (`allegro/parallella/`)
+
+| | |
+|---|---|
+| Upstream | Parallella-I, by the Parallella Foundation |
+| Source | [parallella/parallella-hw](https://github.com/parallella/parallella-hw), `parallella/src/` and `parallella/mfg/`, commit `a6bcdf84` |
+| Licence | CC BY-SA 3.0 US (`allegro/parallella/LICENSE`, the repo's own, the same file as `cadence/parallella-parasdr/LICENSE`) |
+| Copyright | (c) 2016 Parallella Foundation |
+| Taken | 2026-11-08 |
+| Files | `src/parallella_layout.brd`, the Capture schematic `src/parallella_schematic.dsn`, and the two manufacturing packages `mfg/parallella_assy_data.zip` and `mfg/parallella_fab_data.zip` |
+| Modifications | **None.** The packages ship as upstream zips them. |
+| Not included | the BOM spreadsheet, PDFs, photos, datasheets, and the earlier boards under `archive/` |
+
+`.brd` header `03 0c 13 00`. The board names itself `PARALLELLA-I_revD`, and every one of the 552
+designators in the placement report is in it. The packages hold the revD ODB++ job Allegro wrote
+(`parallella-i_revd.odbjob.tgz`), its IPC-356 netlist, a FABMASTER file, `place.rpt`, `sympin.rpt`,
+and the copper films. The board embeds `SPB_16.3` library paths, so the header may be shared by 16.3
+and 16.4.
+
+### ADALM1000 (`allegro/adalm1000/`)
+
+| | |
+|---|---|
+| Upstream | ADALM1000 (M1K), by Analog Devices |
+| Source | [analogdevicesinc/m1k-cad](https://github.com/analogdevicesinc/m1k-cad), `cadence/08_037760d.brd` and `gerbers/`, commit `9432bcc7` |
+| Licence | CC BY-SA 3.0 Unported (`allegro/adalm1000/LICENSE`, the repo's own, for the device in aggregate) |
+| Copyright | Analog Devices; contributors in `CONTRIBUTORS.md` |
+| Taken | 2026-11-08 |
+| Files | `cadence/08_037760d.brd`, every file in `gerbers/` (copper films, drill, IPC-356 netlist, `photo.log`), `BOM.csv`, `CONTRIBUTORS.md` |
+| Modifications | **None.** |
+| Not included | `cadence/artwork.brd`, a second copy saved for artwork, and the PDF schematic |
+
+`.brd` header `03 10 13 00`. `photo.log` records Allegro 16.5S052, and the IPC-356 netlist names
+`08_037760d.brd`, so it is this board's.
+
 ## Cadence exports (`cadence/`)
 
 These are designs as Cadence's tools exported them, in formats agni reads today. Each has a
@@ -397,6 +472,8 @@ These designs were considered and left out.  They're recorded here so nobody rep
 | `stickhub` | CC BY-NC-SA, NonCommercial |
 | `openair-max` | CC BY-SA, left out as reciprocal before "Reciprocal licences" above reversed that rule |
 | Framework Laptop expansion cards | CC-BY-4.0 and fine to ship, but KiCad 5 format, which agni does not read |
+| BeagleBone RevC2, BeagleBone Black RevB4, BeagleBoard-X15 | no LICENSE file in their repos, so nothing grants redistribution. panyam/agni#1446 would fetch them from upstream instead |
+| LimeSDR-USB 1v4 (ASCII and binary `.PcbDoc`) | CC-BY 3.0 and fine to ship, left out for size (64MB). The OpenSpeechPlatform pairs cover the same case |
 
 If a test needs one of these, it should read it from a local KiCad installation. When the file is
 absent, the test should skip loudly, never silently.
