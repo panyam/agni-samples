@@ -59,7 +59,8 @@ when you answer y.
 root with no flags.
 Run it from the root.  agni finds `agni.yaml` from a subfolder too, but then reads its paths against
 the folder you're in.  You need agni v0.6.0 or later, the first release that reads OrCAD Capture
-designs, which Clay R6 is read from.  It opens the seven binary `.PcbDoc` boards and five of the eleven Allegro `.brd` boards,
+designs, which Clay R6 is read from.  CI reads every design with v0.6.0 and with the latest release,
+v0.6.2.  agni opens the seven binary `.PcbDoc` boards and five of the eleven Allegro `.brd` boards,
 counting the two under `cadence/`.  BeaglePlay (Allegro 17.4), BeagleV-Fire (17.5), pc069, SLUGS v2,
 Parallella-I and the ADALM1000 were saved by releases agni does not read yet (agni issue 1355), and
 agni does not read an ASCII `.PcbDoc` yet (agni issue 1393).

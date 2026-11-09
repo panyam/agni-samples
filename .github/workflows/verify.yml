@@ -14,12 +14,17 @@ jobs:
       - run: make verify
       - run: make test
 
-  # Reads every design with the oldest agni the README supports. Raise AGNI_VERSION when the README
-  # raises that floor.
+  # Reads every design twice, with the oldest agni the README supports and with the latest release.
+  # Raise the floor when the README raises it, and move latest when agni tags a release.
   read:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        agni: [v0.6.0, v0.6.2]
+    name: read (agni ${{ matrix.agni }})
     env:
-      AGNI_VERSION: v0.6.0
+      AGNI_VERSION: ${{ matrix.agni }}
     steps:
       - uses: actions/checkout@v4
       - name: Fetch agni
