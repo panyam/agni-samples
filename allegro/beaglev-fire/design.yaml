@@ -1,0 +1,8 @@
+# Added by agni, not part of the upstream design (see PROVENANCE.md). Analysis reads
+# design/BeagleV-FIRE_REV-A_230911.DSN, the design OrCAD Capture saved.
+# design/BeagleV-FIRE_REV-A_230911.brd is the board laid out from it. agni does not read the Allegro
+# release that saved it yet (agni issue 1355), so it is not a companion. Add it under companions once
+# agni reads it.
+name: beaglev-fire
+title: BeagleV-Fire
+entry: design/BeagleV-FIRE_REV-A_230911.DSN

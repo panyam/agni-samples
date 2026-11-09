@@ -1,0 +1,7 @@
+# Added by agni, not part of the upstream design (see PROVENANCE.md). Analysis reads
+# src/parallella_schematic.dsn, the design OrCAD Capture saved. src/parallella_layout.brd is the
+# board laid out from it. Allegro 16.4 saved it, and agni does not read that release yet (agni issue
+# 1355), so it is not a companion. Add it under companions once agni reads it.
+name: parallella
+title: Parallella-I revD
+entry: src/parallella_schematic.dsn

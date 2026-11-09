@@ -265,6 +265,7 @@ Files keep their upstream paths under each board's folder. Allegro's numbered ba
 | Files | `Design/20230215_beagleplayv022_10.brd`, the OrCAD schematic `Design/BEAGLEPLAYV10_221227.DSN`, the Gerbers, drill and route files in `MFG/gerber_beagleplayv022_230215/`, and `BeaglePlay_bom.csv` |
 | Modifications | **None.**  Every file is byte-identical to upstream, checked against its git blob hash. |
 | Not included | PDFs, the placement spreadsheet, certification reports, and the two `,1` backups |
+| Added | `design.yaml`, agni's descriptor (Apache-2.0). It names the Capture schematic as the entry, and leaves the board out until agni reads its Allegro release (agni issue 1355) |
 
 `.brd` header `02 09 14 00`. 8 copper layers (`L1_top` to `L8_bottom`). The Gerbers record
 "Cadence Allegro 17.4-S032", written 2023-02-15.
@@ -281,6 +282,7 @@ Files keep their upstream paths under each board's folder. Allegro's numbered ba
 | Files | `design/BeagleV-FIRE_REV-A_230911.brd`, the OrCAD schematic `design/BeagleV-FIRE_REV-A_230911.DSN`, the Gerbers, drill and route files in `design/gerbers/`, and `design/BeagleV-Fire_BOM.csv` |
 | Modifications | **None.**  Every file is byte-identical to upstream, checked against its git blob hash. |
 | Not included | PDFs, 3D models, and the two `,1` backups |
+| Added | `design.yaml`, agni's descriptor (Apache-2.0). It names the Capture schematic as the entry, and leaves the board out until agni reads its Allegro release (agni issue 1355) |
 
 `.brd` header `02 15 14 00`. 12 copper layers (`TOP`, `LAY2_GND` to `LAY11_GND`, `BOTTOM`). The Gerbers
 record "Cadence Allegro 17.4-S031", written 2023-09-26.
@@ -364,6 +366,7 @@ hash, and keeps its upstream path under the board's folder.
 | Files | `src/parallella_layout.brd`, the Capture schematic `src/parallella_schematic.dsn`, and the two manufacturing packages `mfg/parallella_assy_data.zip` and `mfg/parallella_fab_data.zip` |
 | Modifications | **None.** The packages ship as upstream zips them. |
 | Not included | the BOM spreadsheet, PDFs, photos, datasheets, and the earlier boards under `archive/` |
+| Added | `design.yaml`, agni's descriptor (Apache-2.0). It names the Capture schematic as the entry, and leaves the board out until agni reads its Allegro release (agni issue 1355) |
 
 `.brd` header `03 0c 13 00`. The board names itself `PARALLELLA-I_revD`, and every one of the 552
 designators in the placement report is in it. The packages hold the revD ODB++ job Allegro wrote
