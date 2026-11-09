@@ -1,0 +1,7 @@
+# Added by agni, not part of the upstream design (see PROVENANCE.md). Analysis reads
+# Design/BEAGLEPLAYV10_221227.DSN, the design OrCAD Capture saved. Design/20230215_beagleplayv022_10.brd
+# is the board laid out from it. Allegro 17.4 saved it, and agni does not read that release yet (agni
+# issue 1355), so it is not a companion. Add it under companions once agni reads it.
+name: beagleplay
+title: BeaglePlay
+entry: Design/BEAGLEPLAYV10_221227.DSN

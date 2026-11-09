@@ -27,7 +27,8 @@ done
 
 # Each Allegro board, Allegro ODB++ job and Cadence export needs the publisher's licence beside it
 # and a PROVENANCE.md heading naming its folder. A Cadence export also needs a design.yaml, since
-# agni reads it as a design. An Allegro board has none, since agni reads a .brd by its name.
+# agni reads it as a design. An Allegro folder needs none, since agni reads a .brd by its name.
+# One that also holds the Capture schematic has a design.yaml naming it, and is read as a design.
 for d in allegro/*/ odb/allegro/*/ cadence/*/; do
   [ -d "$d" ] || continue
   dir=${d%/}
@@ -82,7 +83,7 @@ if [ -n "${AGNI:-}" ]; then
   house=${HOUSE_DIR:-house}
   mounts=()
   [ "$house" = house ] || mounts=(--mount boards=boards --mount odb=odb --mount cadence=cadence --mount allegro=allegro --mount altium=altium --mount remote=remote --mount "house=$house")
-  designs=$(find boards cadence -name design.yaml ! -path '*/._*' -exec dirname {} \; 2>/dev/null | sort)
+  designs=$(find boards cadence allegro -name design.yaml ! -path '*/._*' -exec dirname {} \; 2>/dev/null | sort)
   house_designs=$(find "$house" -name design.yaml ! -path '*/._*' ! -path '*/_template/*' -exec dirname {} \; 2>/dev/null | sort)
   jobs=$(find odb -type f \( -name '*.odb.tgz' -o -name '*.odb.zip' \) ! -name '._*' 2>/dev/null | sort)
   # A native board is read by its own name. pc069, BeaglePlay, BeagleV-Fire, SLUGS v2, Parallella-I
