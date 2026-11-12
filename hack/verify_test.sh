@@ -116,6 +116,26 @@ expect fail "a Cadence export with no PROVENANCE.md section" "$t"
 t=$work/allegro-odb-no-licence; cadence_tree "$t"; rm "$t/odb/allegro/gadget/LICENSE"
 expect fail "an Allegro ODB++ job with no LICENSE" "$t"
 
+revision_tree() {
+  clean_tree "$1"; mkdir -p "$1/revisions/alpha-2"
+  printf 'name: alpha-2\nentry: alpha.kicad_sch\n' > "$1/revisions/alpha-2/design.yaml"
+  printf 'Apache-2.0\n' > "$1/revisions/alpha-2/LICENSE"
+  printf '\n### Alpha, rev 2 (`revisions/alpha-2/`)\n' >> "$1/PROVENANCE.md"
+}
+
+t=$work/revision-clean; revision_tree "$t"
+printf 'mount://revisions/alpha-2\n' > "$t/notes.md"; git -C "$t" add notes.md
+expect pass "a later revision with a descriptor, a licence and a section, named by its mount" "$t"
+
+t=$work/revision-no-descriptor; revision_tree "$t"; rm "$t/revisions/alpha-2/design.yaml"
+expect fail "a later revision with no design.yaml" "$t"
+
+t=$work/revision-no-licence; revision_tree "$t"; rm "$t/revisions/alpha-2/LICENSE"
+expect fail "a later revision with no LICENSE" "$t"
+
+t=$work/revision-no-provenance; revision_tree "$t"; printf '# Provenance\n\n## alpha\n' > "$t/PROVENANCE.md"
+expect fail "a later revision with no PROVENANCE.md section" "$t"
+
 t=$work/cadence-mount; cadence_tree "$t"
 printf 'mount://cadence/gizmo\n' > "$t/notes.md"; git -C "$t" add notes.md
 expect pass "a tracked file naming the cadence mount" "$t"

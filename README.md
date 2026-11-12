@@ -44,6 +44,12 @@ its publisher released beside it.
 files.  Two OpenSpeechPlatform boards (BSD-2-Clause) come as a binary `.PcbDoc` and the ASCII
 `.PcbDoc` Altium saved of the same board, with their Gerbers.
 
+`revisions/` holds a later revision of a board above, so two real revisions of one design can be
+compared.  Antmicro's Jetson baseboard rev 1.1.2 sits there beside rev 1.1.0 in `boards/`
+(Apache-2.0).  It ships in its own `revisions` tarball, so the oracle corpus the engine fetches on
+every CI run stays the same size.  `make diff A=mount://boards/jetson-agx-thor-baseboard
+B=mount://revisions/jetson-agx-thor-baseboard-1.1.2` compares the two.
+
 `remote/` holds boards this repo may not redistribute, because their repos state no licence.  Only
 `remote/remote.pin` is committed.  It names each file by its URL at a fixed commit and its sha256.
 `make remote` downloads them from their publishers into a cache in `~/.cache/agni/samples`, so each

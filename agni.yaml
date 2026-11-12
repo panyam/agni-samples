@@ -10,4 +10,5 @@ mounts:
   allegro: allegro
   altium: altium
   remote: remote
+  revisions: revisions
   house: house

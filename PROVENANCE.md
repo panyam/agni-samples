@@ -503,6 +503,32 @@ extract, ODB++ job and netlist are this board's second views.
 
 `.brd` header `03 0c 13 00`, Allegro 16.4.
 
+## Later revisions (`revisions/`)
+
+A later revision of a board above, so agni can compare two real revisions of one design. Each ships
+in the `revisions` tarball rather than in `oracle-corpus`, since each is about the size of its
+board's entry there, and only a demo or a revision example reads it.
+
+### Jetson AGX Thor baseboard, rev 1.1.2 (`revisions/jetson-agx-thor-baseboard-1.1.2/`)
+
+| | |
+|---|---|
+| Upstream | Antmicro, baseboard for NVIDIA Jetson AGX Thor, rev 1.1.2 (the schematic's title block says 1.1.2, dated 2026-04-15) |
+| Source | [antmicro/jetson-agx-thor-baseboard](https://github.com/antmicro/jetson-agx-thor-baseboard), repo root, commit `3411086e` ("Revision bump") |
+| Licence | Apache-2.0 (`revisions/jetson-agx-thor-baseboard-1.1.2/LICENSE`, the repo's own) |
+| Copyright | (c) 2025-2026 Antmicro |
+| Taken | 2026-11-12 |
+| Modifications | **None.**  Design files are byte-identical to upstream at that commit. |
+| Not included | the `img/` renders. Upstream has no `level_shifter_x8.kicad_sch` or `usb.kicad_sch` at this commit, and no sheet of 1.1.2 references them, so the folder holds two fewer sheets than rev 1.1.0's |
+| Added | `design.yaml`, agni's descriptor (Apache-2.0), matching rev 1.1.0's so the two read the same way |
+
+Rev 1.1.0 is `boards/jetson-agx-thor-baseboard`. Between them Antmicro moved the fan's PWM to a new
+regulator on the DCDC sheet, reworked the input power path, added a recovery and reset header (J21)
+and test points on the power rails, and changed some capacitors from 0402 to 0603. The next upstream
+revision, 1.1.3 (`8e087f4f`), was saved by KiCad 10. agni reads it, but there its bus members come
+out with the sheet's name in front (`/DCDC/I2C_{SYS}.SCL` where 1.1.2 has `/I2C_{SYS}.SCL`), so a
+diff from 1.1.2 lists 267 new nets beside 23 new parts. It can join here once that reads the same.
+
 ## Reciprocal licences
 
 Suppose someone distributes a MODIFIED design under a strongly reciprocal licence (CERN-OHL-S, GPL),

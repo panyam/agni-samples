@@ -41,14 +41,14 @@ all: dist
 # MCP=1 also serves agni's analysis to an agent at /mcp. The house mount holds a team's own boards
 # (house/README.md), and HOUSE_DIR moves it to a folder outside the checkout.
 #
-# Every target names all seven mounts, because a --mount replaces agni.yaml's whole table.
+# Every target names all eight mounts, because a --mount replaces agni.yaml's whole table.
 AGNI      ?= agni
 PORT      ?= 8080
 WEB_DIR   ?=
 SITE_DIR  ?= site
 HOUSE_DIR ?= house
 MOUNTS    := --mount boards=boards --mount odb=odb --mount cadence=cadence --mount allegro=allegro --mount altium=altium \
-             --mount remote=remote --mount house=$(HOUSE_DIR)
+             --mount remote=remote --mount revisions=revisions --mount house=$(HOUSE_DIR)
 WEB_FLAG  = $(if $(WEB_DIR),--web-dir $(WEB_DIR))
 SERVE     = $(AGNI) serve $(MOUNTS) --addr 127.0.0.1:$(PORT) $(WEB_FLAG) $(if $(MCP),--mcp)
 
@@ -247,6 +247,16 @@ $(DIST)/remote-boards-$(VERSION).tar.gz:
 	@mkdir -p $(DIST)
 	git ls-files remote | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
 
+# revisions: later revisions of the boards above, both views each, for comparing two revisions in
+# agni. Each is about the size of its board's oracle-corpus entry, so it ships apart and only a
+# demo or a revision example fetches it.
+$(DIST)/revisions-$(VERSION).tar.gz:
+	@mkdir -p $(DIST)
+	find revisions -type f ! -name '._*' \
+	  \( -name '*.kicad_sch' -o -name '*.kicad_pcb' -o -name '*.kicad_pro' -o -name '*.kicad_dru' \
+	     -o -name 'design.yaml' -o -name 'LICENSE' -o -name 'README.md' \) \
+	  | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
+
 # cadence-exports: designs that Cadence's tools exported in formats agni reads today, byte-identical
 # to their publishers'. The ODB++ jobs from Allegro sit under odb/allegro/, beside odb/altium/. The
 # IPC-2581 and EDIF exports sit under cadence/, each with a design.yaml, beside the 16.6 board and
@@ -260,7 +270,7 @@ dist: $(DIST)/tutorial-board-$(VERSION).tar.gz $(DIST)/oracle-corpus-$(VERSION).
       $(DIST)/odb-altium-$(VERSION).tar.gz $(DIST)/odb-kicad-$(VERSION).tar.gz \
       $(DIST)/allegro-$(VERSION).tar.gz $(DIST)/allegro-boards-$(VERSION).tar.gz \
       $(DIST)/cadence-exports-$(VERSION).tar.gz $(DIST)/altium-$(VERSION).tar.gz \
-      $(DIST)/remote-boards-$(VERSION).tar.gz
+      $(DIST)/remote-boards-$(VERSION).tar.gz $(DIST)/revisions-$(VERSION).tar.gz
 	@cd $(DIST) && shasum -a 256 *-$(VERSION).tar.gz > SHA256SUMS
 	@echo
 	@echo "built $(VERSION):"
