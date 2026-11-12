@@ -524,10 +524,25 @@ board's entry there, and only a demo or a revision example reads it.
 
 Rev 1.1.0 is `boards/jetson-agx-thor-baseboard`. Between them Antmicro moved the fan's PWM to a new
 regulator on the DCDC sheet, reworked the input power path, added a recovery and reset header (J21)
-and test points on the power rails, and changed some capacitors from 0402 to 0603. The next upstream
-revision, 1.1.3 (`8e087f4f`), was saved by KiCad 10. agni reads it, but there its bus members come
-out with the sheet's name in front (`/DCDC/I2C_{SYS}.SCL` where 1.1.2 has `/I2C_{SYS}.SCL`), so a
-diff from 1.1.2 lists 267 new nets beside 23 new parts. It can join here once that reads the same.
+and test points on the power rails, and changed some capacitors from 0402 to 0603. Rev 1.1.3 is
+`revisions/jetson-agx-thor-baseboard-1.1.3`, below.
+
+### Jetson AGX Thor baseboard, rev 1.1.3 (`revisions/jetson-agx-thor-baseboard-1.1.3/`)
+
+| | |
+|---|---|
+| Upstream | Antmicro, baseboard for NVIDIA Jetson AGX Thor, rev 1.1.3 (the schematic's title block says 1.1.3, dated 2026-06-24) |
+| Source | [antmicro/jetson-agx-thor-baseboard](https://github.com/antmicro/jetson-agx-thor-baseboard), repo root, commit `8e087f4f` ("Bump version on schematic to 1.1.3") |
+| Licence | Apache-2.0 (`revisions/jetson-agx-thor-baseboard-1.1.3/LICENSE`, the repo's own) |
+| Copyright | (c) 2025-2026 Antmicro |
+| Taken | 2026-11-12 |
+| Modifications | **None.**  Design files are byte-identical to upstream at that commit. |
+| Not included | the `img/` renders and the `doc/` folder |
+| Added | `design.yaml`, agni's descriptor (Apache-2.0), matching rev 1.1.0's so the revisions read the same way |
+
+Upstream's current revision, and the corpus's first board saved by KiCad 10, which keeps bus
+aliases in the `.kicad_pro` rather than in the schematic. agni reads them from there since agni
+issue 1560. Over 1.1.2 it adds 23 parts and drops 3.
 
 ## Reciprocal licences
 

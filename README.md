@@ -44,9 +44,9 @@ its publisher released beside it.
 files.  Two OpenSpeechPlatform boards (BSD-2-Clause) come as a binary `.PcbDoc` and the ASCII
 `.PcbDoc` Altium saved of the same board, with their Gerbers.
 
-`revisions/` holds a later revision of a board above, so two real revisions of one design can be
-compared.  Antmicro's Jetson baseboard rev 1.1.2 sits there beside rev 1.1.0 in `boards/`
-(Apache-2.0).  It ships in its own `revisions` tarball, so the oracle corpus the engine fetches on
+`revisions/` holds later revisions of a board above, so two real revisions of one design can be
+compared.  Antmicro's Jetson baseboard revs 1.1.2 and 1.1.3 sit there beside rev 1.1.0 in `boards/`
+(Apache-2.0).  Rev 1.1.3 was saved by KiCad 10.  It ships in its own `revisions` tarball, so the oracle corpus the engine fetches on
 every CI run stays the same size.  `make diff A=mount://boards/jetson-agx-thor-baseboard
 B=mount://revisions/jetson-agx-thor-baseboard-1.1.2` compares the two.
 
