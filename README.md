@@ -141,6 +141,7 @@ Tarballs are built per purpose, so a job downloads only what it needs:
 | `allegro` | the BeagleBone AI's Allegro `.brd`, with the extract Allegro wrote from the same board |
 | `cadence-exports` | ODB++ jobs Allegro's tools wrote (`odb/allegro/`), and the IPC-2581 and EDIF exports under `cadence/` |
 | `remote-boards` | `remote/remote.pin` alone, from which the engine fetches the `remote/` boards from their publishers |
+| `revisions` | later revisions of the boards above, both views each, for comparing two revisions.  Only a demo or a revision example fetches it |
 | `allegro-boards` | nine more Allegro `.brd` boards: six with the Gerbers, drill files, netlists, placement reports and OrCAD schematics their publishers released beside them, and three whose export is in `cadence-exports` |
 
 `make dist` builds them all and writes `SHA256SUMS`.  `make list` prints the lines to pin.  `make
