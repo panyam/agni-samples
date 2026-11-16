@@ -50,6 +50,10 @@ HOUSE_DIR ?= house
 MOUNTS    := --mount boards=boards --mount odb=odb --mount cadence=cadence --mount allegro=allegro --mount altium=altium \
              --mount remote=remote --mount revisions=revisions --mount house=$(HOUSE_DIR)
 WEB_FLAG  = $(if $(WEB_DIR),--web-dir $(WEB_DIR))
+# agni takes a KiCad part's height from its 3D model, found under AGNI_MODEL_PATH (agni issue 1652).
+# make remote fetches the models. An environment variable rather than --model-path or agni.yaml's
+# model_paths, because an agni older than the flag rejects both and ignores the variable.
+export AGNI_MODEL_PATH ?= $(CURDIR)/remote/kicad-models
 SERVE     = $(AGNI) serve $(MOUNTS) --addr 127.0.0.1:$(PORT) $(WEB_FLAG) $(if $(MCP),--mcp)
 
 serve:
@@ -74,10 +78,12 @@ site:
 READ_AGNI = $(if $(filter command% environment%,$(origin AGNI)),$(AGNI))
 
 # The boards remote/remote.pin names, fetched from their publishers' repos into remote/ through a
-# cache in ~/.cache/agni/samples, so each is downloaded once per machine. remote-clean lists cache
+# cache in ~/.cache/agni/samples, so each is downloaded once per machine. The KiCad library models
+# remote/kicad-models.pin names come the same way, into remote/kicad-models/. remote-clean lists cache
 # files unused for 30 days and deletes them only when you answer y.
 remote:
 	@hack/fetch_remote.sh
+	@hack/fetch_remote.sh remote/kicad-models.pin remote/kicad-models
 
 remote-clean:
 	@hack/clean_remote.sh
@@ -241,7 +247,8 @@ $(DIST)/altium-$(VERSION).tar.gz:
 	find altium -type f ! -name '._*' | sort | tar -cf - -T - $(TAR_IDS) | gzip -n -9 > $@
 
 # remote-boards: where to fetch the boards this repo may not redistribute, and nothing else. It holds
-# remote/remote.pin, the URLs at fixed commits and their sha256. The engine fetches each board from
+# remote/remote.pin, the URLs at fixed commits and their sha256, and remote/kicad-models.pin, the
+# KiCad library models the boards name. The engine fetches each board from
 # its publisher through hack/fetch_remote.sh's cache (PROVENANCE.md, "Boards fetched from upstream").
 $(DIST)/remote-boards-$(VERSION).tar.gz:
 	@mkdir -p $(DIST)
