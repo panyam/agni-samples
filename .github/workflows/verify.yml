@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        agni: [v0.6.0, v0.6.2]
+        agni: [v0.6.0, v0.7.0]
     name: read (agni ${{ matrix.agni }})
     env:
       AGNI_VERSION: ${{ matrix.agni }}
@@ -39,7 +39,7 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ~/.cache/agni/samples
-          key: remote-boards-${{ hashFiles('remote/remote.pin') }}
+          key: remote-boards-${{ hashFiles('remote/remote.pin', 'remote/kicad-models.pin') }}
       - run: make remote
       - run: make verify AGNI="$AGNI"
       - run: make test AGNI="$AGNI"

@@ -66,13 +66,13 @@ root with no flags.
 Run it from the root.  agni finds `agni.yaml` from a subfolder too, but then reads its paths against
 the folder you're in.  You need agni v0.6.0 or later, the first release that reads OrCAD Capture
 designs, which Clay R6 is read from.  CI reads every design with v0.6.0 and with the latest release,
-v0.6.2.  agni opens the seven binary `.PcbDoc` boards and five of the eleven Allegro `.brd` boards,
+v0.7.0.  agni opens the seven binary `.PcbDoc` boards and five of the eleven Allegro `.brd` boards,
 counting the two under `cadence/`.  BeaglePlay (Allegro 17.4), BeagleV-Fire (17.5), pc069, SLUGS v2,
 Parallella-I and the ADALM1000 were saved by releases agni does not read yet (agni issue 1355), and
 agni does not read an ASCII `.PcbDoc` yet (agni issue 1393).
 
 ```bash
-make remote       # fetch the remote/ boards first, if you want them in the viewer
+make remote       # fetch the remote/ boards and KiCad's 3D models first, if you want them in the viewer
 make serve        # the viewer over every board, job, native board and house board, at http://127.0.0.1:8080/
 make serve-wasm   # the same, with each design analysed in your browser
 make site         # the whole set as static files in site/, the way agni's public demo is built
@@ -87,12 +87,33 @@ agni's analysis to an agent at `/mcp`.
 `serve-wasm` caps a design at serve's `--wasm-max-bytes` (128 MB).  A bigger one goes to the server
 engine, and the page says so.  Jetson is about 92 MB, so every board here runs in the browser.
 
+`make remote` also fetches the KiCad library 3D models that Cynthion, Glasgow and MNT Reform name,
+into `remote/kicad-models/` (`remote/kicad-models.pin`, 66 files from KiCad's 10.0.6 library). The
+Makefile points `AGNI_MODEL_PATH` at them, so `make serve` stands each KiCad part at its model's
+height. An agni release newer than v0.7.0 reads them, and older ones ignore the variable. Without
+the models, or under `serve-wasm`, a KiCad part stands at a default height.
+
 `make verify` checks that each board folder has a `design.yaml` and a `PROVENANCE.md` section, and
 that no `project.yaml` sits over the boards.  It also checks that each folder under `allegro/`,
 `odb/allegro/` and `cadence/` has a `LICENSE` and a `PROVENANCE.md` heading, and that each design
 under `cadence/` has a `design.yaml`.  `make verify AGNI=agni` also reads every design, job and house
 board, and fails on any that reads as no components.  `make test` checks those checks, and CI runs
 both.
+
+## What to look at in the viewer
+
+Each board view's **Stack** button stands the board's layers and parts in 3D, and **Board** beside
+**Layers** shows it as its maker's tool does. These need an agni newer than v0.7.0 until the next
+release, so run a dev build with `make serve AGNI=../agni/bin/agni WEB_DIR=../agni/web`.
+
+| Open | To see |
+|---|---|
+| `boards/glasgow-revC3`, then its board beside the schematic | a KiCad board in the Board look, with 213 of its parts at their 3D models' heights (after `make remote`) |
+| `altium/foxbms/hw-master` | an Altium `.PcbDoc` stack, with 317 of 326 parts at the heights the file states |
+| `cadence/parallella-parasdr` | an Allegro 16.6 board's stack and outline, with 284 of 405 part heights |
+| `allegro/beaglebone-ai` | a 23-row Allegro stack, read beside the extract Allegro wrote |
+| `cadence/clay-r6` | an OrCAD Capture schematic on its Allegro board. Click a part on one and find it on the other |
+| `boards/jetson-agx-thor-baseboard` | the largest board here, 1123 parts over 17 sheets. Its models sit in Antmicro's own library, so its parts stand at a default height |
 
 ## Your own boards beside these
 
@@ -140,7 +161,7 @@ Tarballs are built per purpose, so a job downloads only what it needs:
 | `odb-kicad` | each board above exported to ODB++ by kicad-cli, for reading a board both ways |
 | `allegro` | the BeagleBone AI's Allegro `.brd`, with the extract Allegro wrote from the same board |
 | `cadence-exports` | ODB++ jobs Allegro's tools wrote (`odb/allegro/`), and the IPC-2581 and EDIF exports under `cadence/` |
-| `remote-boards` | `remote/remote.pin` alone, from which the engine fetches the `remote/` boards from their publishers |
+| `remote-boards` | `remote/remote.pin` and `remote/kicad-models.pin` alone, from which the engine fetches the `remote/` boards from their publishers and KiCad's 3D models from KiCad's repo |
 | `revisions` | later revisions of the boards above, both views each, for comparing two revisions.  Only a demo or a revision example fetches it |
 | `allegro-boards` | nine more Allegro `.brd` boards: six with the Gerbers, drill files, netlists, placement reports and OrCAD schematics their publishers released beside them, and three whose export is in `cadence-exports` |
 

@@ -503,6 +503,25 @@ extract, ODB++ job and netlist are this board's second views.
 
 `.brd` header `03 0c 13 00`, Allegro 16.4.
 
+### KiCad's 3D models (`remote/kicad-models/`)
+
+| | |
+|---|---|
+| Upstream | KiCad's 3D model library, by the KiCad library team |
+| Source | [kicad/libraries/kicad-packages3D](https://gitlab.com/kicad/libraries/kicad-packages3D), tag `10.0.6`, commit `e62ed1fc` |
+| Licence | CC-BY-SA 4.0, with an exception for designs that use the library |
+| Fetched | the STEP models that Cynthion, Glasgow and MNT Reform name and KiCad 10's library still has |
+
+The KiCad boards above name each part's 3D model, and agni takes the part's height from it (agni
+issue 1652). The licence would let this repo ship them, with attribution and under the same licence.
+They are fetched instead, like the boards above, so the repo stays one licence lighter. Each file
+hashes the same as KiCad 10.0.6's installed library.
+
+With them, agni gives a height to 213 of Glasgow's 265 parts, 279 of Cynthion's 348 and 467 of MNT
+Reform's 529. The rest name models that KiCad 10's library no longer has, or that sit beside the
+board and its repo does not ship. Jetson names Antmicro's own library through `${ANT3DMDL}`, so it
+gets none yet. RoyalBlue54L's board file does not parse (agni issue 681), so its models are left out.
+
 ## Later revisions (`revisions/`)
 
 A later revision of a board above, so agni can compare two real revisions of one design. Each ships

@@ -57,12 +57,15 @@ if [ -f remote/remote.pin ]; then
   pinned=$(awk '$1 !~ /^#/ && NF >= 3 {print $2}' remote/remote.pin | sort -u)
   [ -n "$pinned" ] || bad "remote/remote.pin names no boards"
 fi
+if [ -f remote/kicad-models.pin ]; then
+  grep -qE "^#+ .*\(\`remote/kicad-models/\`\)" PROVENANCE.md 2>/dev/null || bad "remote/kicad-models.pin has no PROVENANCE.md heading naming (\`remote/kicad-models/\`)"
+fi
 for b in $pinned; do
   grep -qE "^#+ .*\(\`remote/$b/\`\)" PROVENANCE.md 2>/dev/null || bad "remote/$b has no PROVENANCE.md heading naming (\`remote/$b/\`)"
 done
 if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   while IFS= read -r f; do
-    [ "$f" = remote/remote.pin ] || bad "$f is tracked, and remote/ boards are fetched, never shipped (remote/remote.pin)"
+    case $f in remote/remote.pin | remote/kicad-models.pin) ;; *) bad "$f is tracked, and remote/ boards are fetched, never shipped (remote/remote.pin)" ;; esac
   done < <(git ls-files -- remote)
 fi
 
