@@ -66,7 +66,7 @@ root with no flags.
 Run it from the root.  agni finds `agni.yaml` from a subfolder too, but then reads its paths against
 the folder you're in.  You need agni v0.6.0 or later, the first release that reads OrCAD Capture
 designs, which Clay R6 is read from.  CI reads every design with v0.6.0 and with the latest release,
-v0.7.0.  agni opens the seven binary `.PcbDoc` boards and five of the eleven Allegro `.brd` boards,
+v0.8.0.  agni opens the seven binary `.PcbDoc` boards and five of the eleven Allegro `.brd` boards,
 counting the two under `cadence/`.  BeaglePlay (Allegro 17.4), BeagleV-Fire (17.5), pc069, SLUGS v2,
 Parallella-I and the ADALM1000 were saved by releases agni does not read yet (agni issue 1355), and
 agni does not read an ASCII `.PcbDoc` yet (agni issue 1393).
@@ -90,7 +90,7 @@ engine, and the page says so.  Jetson is about 92 MB, so every board here runs i
 `make remote` also fetches the KiCad library 3D models that Cynthion, Glasgow and MNT Reform name,
 into `remote/kicad-models/` (`remote/kicad-models.pin`, 66 files from KiCad's 10.0.6 library). The
 Makefile points `AGNI_MODEL_PATH` at them, so `make serve` stands each KiCad part at its model's
-height. An agni release newer than v0.7.0 reads them, and older ones ignore the variable. Without
+height. agni v0.8.0 and later read them, and older releases ignore the variable. Without
 the models, or under `serve-wasm`, a KiCad part stands at a default height.
 
 `make verify` checks that each board folder has a `design.yaml` and a `PROVENANCE.md` section, and
@@ -103,8 +103,7 @@ both.
 ## What to look at in the viewer
 
 Each board view's **Stack** button stands the board's layers and parts in 3D, and **Board** beside
-**Layers** shows it as its maker's tool does. These need an agni newer than v0.7.0 until the next
-release, so run a dev build with `make serve AGNI=../agni/bin/agni WEB_DIR=../agni/web`.
+**Layers** shows it as its maker's tool does. These need agni v0.8.0 or later.
 
 | Open | To see |
 |---|---|
