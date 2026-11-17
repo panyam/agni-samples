@@ -18,14 +18,14 @@
 # match is never skipped, since a test reading a board that did not arrive passes over nothing.
 # hack/clean_remote.sh lists old cache entries and deletes them only when asked.
 set -euo pipefail
+# Git Bash on Windows has sha256sum and no shasum (agni issue 1595).
+command -v shasum >/dev/null || shasum() { shift 2; sha256sum "$@"; }
 
 pin=${1:-remote/remote.pin}
 dest=${2:-remote}
 cache=${AGNI_SAMPLES_CACHE:-${XDG_CACHE_HOME:-$HOME/.cache}/agni/samples}
 
 [ -f "$pin" ] || { echo "fetch_remote: no pin file at $pin" >&2; exit 1; }
-# Git Bash on Windows has sha256sum and no shasum (agni issue 1595).
-command -v shasum >/dev/null || shasum() { shift 2; sha256sum "$@"; }
 command -v curl >/dev/null || { echo "fetch_remote: curl not found" >&2; exit 1; }
 mkdir -p "$cache" "$dest"
 
