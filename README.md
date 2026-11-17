@@ -88,7 +88,7 @@ agni's analysis to an agent at `/mcp`.
 engine, and the page says so.  Jetson is about 92 MB, so every board here runs in the browser.
 
 `make remote` also fetches the KiCad library 3D models that Cynthion, Glasgow and MNT Reform name,
-into `remote/kicad-models/` (`remote/kicad-models.pin`, 66 files from KiCad's 10.0.6 library). The
+into `remote/kicad-models/` (`remote/kicad-models.pin`, 66 STEP files from KiCad's 10.0.6 library and the `.wrl` mesh beside each from 9.0.0). The
 Makefile points `AGNI_MODEL_PATH` at them, so `make serve` stands each KiCad part at its model's
 height. agni v0.8.0 and later read them, and older releases ignore the variable. Without
 the models, or under `serve-wasm`, a KiCad part stands at a default height.

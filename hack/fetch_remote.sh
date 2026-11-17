@@ -18,6 +18,8 @@
 # match is never skipped, since a test reading a board that did not arrive passes over nothing.
 # hack/clean_remote.sh lists old cache entries and deletes them only when asked.
 set -euo pipefail
+# Git Bash on Windows has sha256sum and no shasum (agni issue 1595).
+command -v shasum >/dev/null || shasum() { shift 2; sha256sum "$@"; }
 
 pin=${1:-remote/remote.pin}
 dest=${2:-remote}
@@ -73,9 +75,11 @@ while read -r sum board url action extra; do
   # The cache file's time records its last use, which clean_remote.sh reads.
   touch "$cached"
 
-  # A board's folder is filled once per pinned file. The stamp names the file, so a pin that moves
-  # fills the folder again.
-  stamp="$dest/$board/.fetched-$sum"
+  # A board's folder is filled once per pinned file. The stamp names the file's checksum and its
+  # name, so a pin that moves fills the folder again, and two files with the same bytes both land.
+  name=$(basename "${url%%\?*}")
+  name=$(printf '%b' "${name//%/\\x}")
+  stamp="$dest/$board/.fetched-$sum-$(printf '%s' "$name" | cksum | cut -d' ' -f1)"
   [ -f "$stamp" ] && continue
   mkdir -p "$dest/$board"
   if [ "${action:-}" = unzip ]; then
@@ -85,8 +89,6 @@ while read -r sum board url action extra; do
     unzip_nested "$staged"
     cp -R "$staged"/. "$dest/$board"/
   else
-    name=$(basename "${url%%\?*}")
-    name=$(printf '%b' "${name//%/\\x}")
     clone "$cached" "$dest/$board/$name"
   fi
   touch "$stamp"

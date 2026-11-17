@@ -510,12 +510,13 @@ extract, ODB++ job and netlist are this board's second views.
 | Upstream | KiCad's 3D model library, by the KiCad library team |
 | Source | [kicad/libraries/kicad-packages3D](https://gitlab.com/kicad/libraries/kicad-packages3D), tag `10.0.6`, commit `e62ed1fc` |
 | Licence | CC-BY-SA 4.0, with an exception for designs that use the library |
-| Fetched | the STEP models that Cynthion, Glasgow and MNT Reform name and KiCad 10's library still has |
+| Fetched | the STEP models that Cynthion, Glasgow and MNT Reform name and KiCad 10's library still has, and the `.wrl` mesh beside each from tag `9.0.0`, commit `d5db5cea` |
 
 The KiCad boards above name each part's 3D model, and agni takes the part's height from it (agni
 issue 1652). The licence would let this repo ship them, with attribution and under the same licence.
 They are fetched instead, like the boards above, so the repo stays one licence lighter. Each file
-hashes the same as KiCad 10.0.6's installed library.
+hashes the same as KiCad 10.0.6's installed library. KiCad 10 ships STEP only, so each model's `.wrl`
+mesh comes from KiCad 9.0.0. agni draws those meshes in its stack view (agni issue 1652).
 
 With them, agni gives a height to 213 of Glasgow's 265 parts, 279 of Cynthion's 348 and 467 of MNT
 Reform's 529. The rest name models that KiCad 10's library no longer has, or that sit beside the
@@ -527,15 +528,16 @@ gets none yet. RoyalBlue54L's board file does not parse (agni issue 681), so its
 | | |
 |---|---|
 | Upstream | Antmicro's hardware components library |
-| Source | [antmicro/hardware-components](https://github.com/antmicro/hardware-components), `gltf-models/`, commit `2efa3967` |
+| Source | [antmicro/hardware-components](https://github.com/antmicro/hardware-components), `gltf-models/`, each model's `LOD2/` version, commit `2efa3967` |
 | Licence | Apache-2.0 |
 | Fetched | the glTF model, with its `.bin`, for each of Jetson's model names the library has |
 
 Jetson's board names each part's model as `${ANT3DMDL}/<name>.step`, and Antmicro does not publish
 that STEP library. It publishes glTF models of the same parts, and agni reads the glTF beside each
 named `.step` (agni issue 1687). 48 of Jetson's 67 model names have one, covering 938 of its 1011
-parts. The licence would let this repo ship them. They are fetched instead, because their textures
-come to about 54 MB.
+parts. The pin takes Antmicro's LOD2 version of each, with about a third of the triangles, since agni
+draws them in its stack view (agni issue 1652). Each LOD2 extent is within 0.04 mm of the full model's.
+The licence would let this repo ship them. They are fetched instead, because they come to about 16 MB.
 
 ## Later revisions (`revisions/`)
 
