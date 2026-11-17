@@ -522,6 +522,21 @@ Reform's 529. The rest name models that KiCad 10's library no longer has, or tha
 board and its repo does not ship. Jetson names Antmicro's own library through `${ANT3DMDL}`, so it
 gets none yet. RoyalBlue54L's board file does not parse (agni issue 681), so its models are left out.
 
+### Antmicro's 3D models (`remote/antmicro-models/`)
+
+| | |
+|---|---|
+| Upstream | Antmicro's hardware components library |
+| Source | [antmicro/hardware-components](https://github.com/antmicro/hardware-components), `gltf-models/`, commit `2efa3967` |
+| Licence | Apache-2.0 |
+| Fetched | the glTF model, with its `.bin`, for each of Jetson's model names the library has |
+
+Jetson's board names each part's model as `${ANT3DMDL}/<name>.step`, and Antmicro does not publish
+that STEP library. It publishes glTF models of the same parts, and agni reads the glTF beside each
+named `.step` (agni issue 1687). 48 of Jetson's 67 model names have one, covering 938 of its 1011
+parts. The licence would let this repo ship them. They are fetched instead, because their textures
+come to about 54 MB.
+
 ## Later revisions (`revisions/`)
 
 A later revision of a board above, so agni can compare two real revisions of one design. Each ships
