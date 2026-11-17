@@ -54,6 +54,9 @@ WEB_FLAG  = $(if $(WEB_DIR),--web-dir $(WEB_DIR))
 # make remote fetches the models. An environment variable rather than --model-path or agni.yaml's
 # model_paths, because an agni older than the flag rejects both and ignores the variable.
 export AGNI_MODEL_PATH ?= $(CURDIR)/remote/kicad-models
+# Jetson names Antmicro's models through ${ANT3DMDL} (agni issue 1687). An agni older than the variable
+# ignores it.
+export AGNI_MODEL_VARS ?= ANT3DMDL=$(CURDIR)/remote/antmicro-models/hardware-components
 SERVE     = $(AGNI) serve $(MOUNTS) --addr 127.0.0.1:$(PORT) $(WEB_FLAG) $(if $(MCP),--mcp)
 
 serve:
@@ -78,12 +81,15 @@ site:
 READ_AGNI = $(if $(filter command% environment%,$(origin AGNI)),$(AGNI))
 
 # The boards remote/remote.pin names, fetched from their publishers' repos into remote/ through a
-# cache in ~/.cache/agni/samples, so each is downloaded once per machine. The KiCad library models
-# remote/kicad-models.pin names come the same way, into remote/kicad-models/. remote-clean lists cache
+# cache in ~/.cache/agni/samples, so each is downloaded once per machine. Every other remote/<name>.pin
+# names 3D models, such as KiCad's or Antmicro's, and they come the same way, into remote/<name>/. remote-clean lists cache
 # files unused for 30 days and deletes them only when you answer y.
 remote:
 	@hack/fetch_remote.sh
-	@hack/fetch_remote.sh remote/kicad-models.pin remote/kicad-models
+	@for pin in remote/*.pin; do \
+	  [ "$$pin" = remote/remote.pin ] && continue; \
+	  hack/fetch_remote.sh "$$pin" "$${pin%.pin}"; \
+	done
 
 remote-clean:
 	@hack/clean_remote.sh

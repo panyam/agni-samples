@@ -10,8 +10,7 @@ house/*
 reports/
 
 # Boards fetched from their publishers' own repos (remote/remote.pin) are never committed, since
-# nothing grants this repo the right to redistribute them. KiCad's 3D models (remote/kicad-models.pin)
-# are fetched the same way. Only the pin files are tracked.
+# nothing grants this repo the right to redistribute them. 3D models (remote/kicad-models.pin,
+# remote/antmicro-models.pin) are fetched the same way. Only the pin files are tracked.
 remote/*
-!remote/remote.pin
-!remote/kicad-models.pin
+!remote/*.pin

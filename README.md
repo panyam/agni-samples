@@ -92,6 +92,8 @@ into `remote/kicad-models/` (`remote/kicad-models.pin`, 66 files from KiCad's 10
 Makefile points `AGNI_MODEL_PATH` at them, so `make serve` stands each KiCad part at its model's
 height. agni v0.8.0 and later read them, and older releases ignore the variable. Without
 the models, or under `serve-wasm`, a KiCad part stands at a default height.
+It also fetches Antmicro's glTF models for Jetson (`remote/antmicro-models.pin`), and the Makefile
+points `AGNI_MODEL_VARS` at them for Jetson's `${ANT3DMDL}`. An agni newer than v0.8.0 reads them.
 
 `make verify` checks that each board folder has a `design.yaml` and a `PROVENANCE.md` section, and
 that no `project.yaml` sits over the boards.  It also checks that each folder under `allegro/`,
@@ -112,7 +114,7 @@ Each board view's **Stack** button stands the board's layers and parts in 3D, an
 | `cadence/parallella-parasdr` | an Allegro 16.6 board's stack and outline, with 284 of 405 part heights |
 | `allegro/beaglebone-ai` | a 23-row Allegro stack, read beside the extract Allegro wrote |
 | `cadence/clay-r6` | an OrCAD Capture schematic on its Allegro board. Click a part on one and find it on the other |
-| `boards/jetson-agx-thor-baseboard` | the largest board here, 1123 parts over 17 sheets. Its models sit in Antmicro's own library, so its parts stand at a default height |
+| `boards/jetson-agx-thor-baseboard` | the largest board here, 1123 parts over 17 sheets, with 938 parts at the heights of Antmicro's glTF models (after `make remote`, with an agni newer than v0.8.0) |
 
 ## Your own boards beside these
 
@@ -160,7 +162,7 @@ Tarballs are built per purpose, so a job downloads only what it needs:
 | `odb-kicad` | each board above exported to ODB++ by kicad-cli, for reading a board both ways |
 | `allegro` | the BeagleBone AI's Allegro `.brd`, with the extract Allegro wrote from the same board |
 | `cadence-exports` | ODB++ jobs Allegro's tools wrote (`odb/allegro/`), and the IPC-2581 and EDIF exports under `cadence/` |
-| `remote-boards` | `remote/remote.pin` and `remote/kicad-models.pin` alone, from which the engine fetches the `remote/` boards from their publishers and KiCad's 3D models from KiCad's repo |
+| `remote-boards` | the pin files under `remote/` alone, from which the engine fetches the `remote/` boards from their publishers, and KiCad's and Antmicro's 3D models from theirs |
 | `revisions` | later revisions of the boards above, both views each, for comparing two revisions.  Only a demo or a revision example fetches it |
 | `allegro-boards` | nine more Allegro `.brd` boards: six with the Gerbers, drill files, netlists, placement reports and OrCAD schematics their publishers released beside them, and three whose export is in `cadence-exports` |
 
