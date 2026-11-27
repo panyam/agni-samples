@@ -109,3 +109,31 @@ parameters {
   pin_refs: "out"
   prov { doc_ref: "slvscp4b" page: 5 table_or_figure: "7.5 Electrical Characteristics: TJ = TA = 25C" method: "hand" confidence: 1 }
 }
+
+parameters {
+  name: "Electrostatic discharge, IEC 61000-4-2 contact discharge"
+  symbol: "V(ESD)"
+  limit_kind: LIMIT_KIND_ABSOLUTE_MAX
+  value { min: -12000 max: 12000 }
+  unit: "V"
+  condition_coverage: CONDITION_COVERAGE_UNCONDITIONAL
+  pin_refs: "out"
+  pin_refs: "d1"
+  pin_refs: "d2"
+  attributes { key: "esd_test_model" value: "iec" }
+  prov { doc_ref: "slvscp4b" page: 4 table_or_figure: "7.2 ESD Ratings" method: "hand" confidence: 1 }
+}
+
+parameters {
+  name: "Electrostatic discharge, IEC 61000-4-2 air-gap discharge"
+  symbol: "V(ESD)"
+  limit_kind: LIMIT_KIND_ABSOLUTE_MAX
+  value { min: -15000 max: 15000 }
+  unit: "V"
+  condition_coverage: CONDITION_COVERAGE_UNCONDITIONAL
+  pin_refs: "out"
+  pin_refs: "d1"
+  pin_refs: "d2"
+  attributes { key: "esd_test_model" value: "iec" }
+  prov { doc_ref: "slvscp4b" page: 4 table_or_figure: "7.2 ESD Ratings" method: "hand" confidence: 1 }
+}

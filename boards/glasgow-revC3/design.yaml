@@ -4,7 +4,8 @@
 #
 # params/ holds datasheet facts for parts with built-in protection, which agni's rules need. Each
 # fact is transcribed from the vendor's datasheet and cites its revision and page. U15's TPD3S014
-# limits the current on the USB-C VBUS entry and blocks reverse current (agni issue 1248).
+# limits the current on the USB-C VBUS entry and blocks reverse current (agni issue 1248). Its D1 and
+# D2 clamps carry an IEC 61000-4-2 rating, which protects USB D+ and D- (agni issue 1918).
 name: glasgow-revc3
 title: Glasgow Interface Explorer revC3
 entry: glasgow.kicad_sch
